@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mutabaah Digital Tahfizh Siswa</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    .page { display: none !important; }
+    .page.active { display: block !important; }
+
+    #app-layout.is-hidden { display: none !important; }
+    #app-layout.is-visible { display: flex !important; }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .autocomplete-item {
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .autocomplete-item:hover {
+      background-color: #f1f5f9;
+      color: #059669;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen">
+
+  <!-- LOG IN PAGE -->
+  <div id="page-login" class="page active min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-emerald-600 to-teal-800">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="book-open" class="w-8 h-8"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900">Mutabaah Tahfizh</h1>
+        <p class="text-sm text-slate-500 mt-1">Sistem Informasi Perkembangan Siswa</p>
+      </div>
+
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Peran Akses</label>
+          <select id="login-role" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="guru">Guru Tahfizh</option>
+            <option value="admin">Administrator / Koordinator Tahfizh</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Username / NIP</label>
+          <input type="text" id="login-username" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin / guru">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Kata Sandi</label>
+          <input type="password" id="login-password" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin123 / guru123">
+        </div>
+        <button type="submit" id="btn-login-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2">
+          Masuk ke Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP LAYOUT -->
+  <div id="app-layout" class="is-hidden min-h-screen flex-col md:flex-row">
+    
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0">
+      <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i data-lucide="book-open" class="text-emerald-400 w-6 h-6"></i>
+          <span class="font-bold text-white text-lg">TahfizhApp</span>
+        </div>
+        <span id="user-badge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-medium">GURU</span>
+      </div>
+      <nav class="p-4 space-y-1">
+        <button onclick="switchPage('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+        </button>
+        
+        <button id="nav-master-data" onclick="switchPage('master-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200 hidden">
+          <i data-lucide="database" class="w-5 h-5"></i> Kelola Master Data
+        </button>
+
+        <button onclick="switchPage('whatsapp-plan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
+          <i data-lucide="send" class="w-5 h-5"></i> Pesan WA Orang Tua
+        </button>
+        <button onclick="switchPage('input-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
+          <i data-lucide="edit-3" class="w-5 h-5"></i> Input Setoran Harian
+        </button>
+        <button onclick="switchPage('report')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
+          <i data-lucide="file-text" class="w-5 h-5"></i> Cetak Laporan PDF
+        </button>
+        <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-rose-900/40 text-rose-400 transition-colors mt-8">
+          <i data-lucide="log-out" class="w-5 h-5"></i> Keluar
+        </button>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+      
+      <!-- DASHBOARD -->
+      <section id="page-dashboard" class="page space-y-6">
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-900">Dashboard Ringkasan</h2>
+            <p class="text-slate-500 text-sm">Ringkasan statistik dan perkembangan hafalan siswa.</p>
+          </div>
+        </header>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="users"></i></div>
+            <div><p class="text-xs text-slate-500">Total Siswa</p><p id="stat-total-siswa" class="text-xl font-bold">0 Siswa</p></div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="p-3 bg-teal-100 text-teal-600 rounded-lg"><i data-lucide="award"></i></div>
+            <div><p class="text-xs text-slate-500">Rata-rata Capaian</p><p id="stat-rata-capaian" class="text-xl font-bold">Baik</p></div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="p-3 bg-amber-100 text-amber-600 rounded-lg"><i data-lucide="clock"></i></div>
+            <div><p class="text-xs text-slate-500">Status Muraja'ah</p><p id="stat-murajaah" class="text-xl font-bold text-emerald-600">Aktif</p></div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="calendar"></i></div>
+            <div><p class="text-xs text-slate-500">Sistem</p><p class="text-xl font-bold text-emerald-600">Terhubung</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MASTER DATA -->
+      <section id="page-master-data" class="page space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Kelola Master Data</h2>
+          <p class="text-slate-500 text-sm">Tambahkan data siswa, guru, kelas/halqah, dan akun pengguna baru.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="user-plus" class="text-emerald-600"></i> Tambah Siswa Baru
+            </h3>
+            <form onsubmit="handleMasterSubmit(event, 'Siswa')" class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium mb-1">Nama Lengkap Siswa</label>
+                <input type="text" id="master-siswa-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Masukkan nama siswa">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium mb-1">NIS / NISN</label>
+                  <input type="text" id="master-siswa-nis" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="123456">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">Kelas / Halqah</label>
+                  <select id="master-siswa-kelas" required class="select-kelas-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="" disabled selected>-- Pilih Kelas --</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Nomor WhatsApp Orang Tua</label>
+                <input type="text" id="master-siswa-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="628123456789">
+              </div>
+              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Siswa</button>
+            </form>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="user-check" class="text-emerald-600"></i> Tambah Guru / Ustaz
+            </h3>
+            <form onsubmit="handleMasterSubmit(event, 'Guru')" class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium mb-1">Nama Lengkap Guru</label>
+                <input type="text" id="master-guru-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ust. Fulan, S.Pd">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">NIP / ID Guru</label>
+                <input type="text" id="master-guru-nip" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="GURU-001">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">No. WhatsApp</label>
+                <input type="text" id="master-guru-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="628123456789">
+              </div>
+              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Guru</button>
+            </form>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="school" class="text-emerald-600"></i> Tambah Kelas / Halqah Baru
+            </h3>
+            <form onsubmit="handleMasterSubmit(event, 'Kelas')" class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium mb-1">Nama Kelas / Halqah</label>
+                <input type="text" id="master-kelas-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="contoh: 8A - Mus'ab bin 'Umair">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Guru Pembimbing / Musyrif</label>
+                <select id="master-kelas-guru" required class="select-guru-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                  <option value="" disabled selected>-- Pilih Guru --</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Kelas</button>
+            </form>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="shield-check" class="text-emerald-600"></i> Tambah Akun User Pengguna
+            </h3>
+            <form onsubmit="handleMasterSubmit(event, 'User')" class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium mb-1">Username Pengguna</label>
+                <input type="text" id="master-user-name" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="username_login">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Kata Sandi (Password)</label>
+                <input type="password" id="master-user-pass" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="••••••••">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Peran Akses (Role)</label>
+                <select id="master-user-role" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                  <option value="guru">Guru Tahfizh</option>
+                  <option value="admin">Administrator / Koordinator Tahfizh</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Akun User</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+ <!-- WA GENERATOR & PLANNER -->
+<section id="page-whatsapp-plan" class="page space-y-6">
+  <h2 class="text-2xl font-bold text-slate-900">Perencanaan Harian & Kirim WA</h2>
+  
+  <!-- Container Utama 2 Kolom (Kiri: Form, Kanan: Preview WA) -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- KOLOM KIRI: FORM TARGET & LAPORAN -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+      <h3 class="font-bold text-slate-800 border-b pb-2">Form Target & Laporan Setoran</h3>
+      
+      <!-- Sub-Grid Form Header -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        
+        <!-- Tanggal Target Besok -->
+        <div>
+          <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Target Besok</label>
+          <input type="date" id="wa-tanggal-target" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <!-- Tanggal Laporan + Tombol Cari (Desain Input Group menyatu) -->
+        <div>
+          <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Laporan</label>
+          <div class="flex items-center">
+            <input type="date" id="wa-tanggal-laporan" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-l-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 border-r-0">
+            <button type="button" onclick="muatDataLaporanHarian()" title="Cari Data Laporan" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-r-lg text-xs font-medium transition-colors flex items-center justify-center shrink-0 shadow-sm gap-1">
+              <i data-lucide="search" class="w-3.5 h-3.5"></i>
+              <span>Cari</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Kelas -->
+        <div>
+          <label class="block text-xs font-medium mb-1 text-slate-600">Filter Kelas</label>
+          <select id="wa-filter-kelas" onchange="filterSiswaByKelas('wa-filter-kelas', 'wa-siswa')" class="select-kelas-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            <option value="">-- Semua --</option>
+          </select>
+        </div>
+
+        <!-- No. WA Ortu -->
+        <div>
+          <label class="block text-xs font-medium mb-1 text-slate-600">No. WA Ortu</label>
+          <input type="text" id="wa-nomor" placeholder="628xxx" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <!-- Pilih Siswa (Span 2 Kolom Penuh) -->
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-medium mb-1 text-slate-600">Pilih Siswa</label>
+          <select id="wa-siswa" onchange="loadTargetWABySiswa()" class="select-siswa-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            <option value="" disabled selected>-- Memuat... --</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Target 1: Ziyadah -->
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+        <span class="text-xs font-bold text-emerald-800 block">1. Target Ziyadah Besok (Hafalan Baru)</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div class="relative">
+            <input type="text" id="wa-ziyadah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+            <div id="wa-ziyadah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+          </div>
+          <div class="relative">
+            <input type="text" id="wa-ziyadah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+            <div id="wa-ziyadah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Target 2: Tahsin -->
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+        <span class="text-xs font-bold text-emerald-800 block">2. Target Tahsin / Iqro Besok</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div class="relative">
+            <input type="text" id="wa-tahsin-dari" autocomplete="off" placeholder="Dari Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+            <div id="wa-tahsin-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+          </div>
+          <div class="relative">
+            <input type="text" id="wa-tahsin-sampai" autocomplete="off" placeholder="Sampai Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+            <div id="wa-tahsin-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Target 3: Murajaah -->
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+        <span class="text-xs font-bold text-emerald-800 block">3. Target Murajaah Besok (Pengulangan)</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div class="relative">
+            <input type="text" id="wa-murajaah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+            <div id="wa-murajaah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+          </div>
+          <div class="relative">
+            <input type="text" id="wa-murajaah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+            <div id="wa-murajaah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catatan Tambahan -->
+      <div>
+        <label class="block text-xs font-medium mb-1 text-slate-600">Catatan Tambahan Pembimbing</label>
+        <textarea id="wa-catatan" oninput="generateWaText()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500" rows="2" placeholder="Tuliskan pesan khusus untuk orang tua..."></textarea>
+      </div>
+
+      <!-- Tombol Simpan Rencana -->
+      <button onclick="saveRencanaWA()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-xs md:text-sm">
+        <i data-lucide="save" class="w-4 h-4"></i> Simpan Rencana Target ke Google Sheets
+      </button>
+    </div>
+
+    <!-- KOLOM KANAN: PREVIEW PESAN WA -->
+    <div class="bg-slate-100 p-6 rounded-xl border border-slate-300 flex flex-col justify-between h-full">
+      <div>
+        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="eye" class="w-4 h-4 text-emerald-600"></i> Preview Pesan WhatsApp
+        </h3>
+        <div id="wa-preview" class="bg-white p-4 rounded-lg shadow-inner text-xs md:text-sm font-mono whitespace-pre-wrap text-slate-700 border border-slate-200 min-h-[350px]">
+        </div>
+      </div>
+      <button onclick="sendWhatsApp()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-xs md:text-sm">
+        <i data-lucide="message-circle" class="w-4 h-4"></i> Kirim Langsung via WhatsApp
+      </button>
+    </div>
+
+  </div>
+</section>
+
+ <!-- INPUT DATA MUTABAAH -->
+<section id="page-input-data" class="page space-y-6">
+  <h2 class="text-2xl font-bold text-slate-900">Input Mutabaah Harian Siswa</h2>
+  <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 max-w-4xl">
+    
+    <form id="form-mutabaah" onsubmit="submitMutabaah(event)" class="p-6 space-y-6">
+      
+     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+  <div>
+    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Tanggal Setoran</label>
+    <input type="date" id="input-tanggal" value="" onchange="autoFillFromRencanaWA()" required class="w-full bg-white px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+  </div>
+  <div>
+    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Filter Kelas</label>
+    <select id="input-filter-kelas" onchange="filterSiswaByKelas('input-filter-kelas', 'input-siswa')" class="select-kelas-list w-full bg-white px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+      <option value="">-- Semua Kelas --</option>
+    </select>
+  </div>
+  <div>
+    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Nama Siswa</label>
+    <select id="input-siswa" onchange="updateSiswaKelas(); autoFillFromRencanaWA();checkExistingMutabaah();" required class="select-siswa-list w-full bg-white px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+      <option value="" disabled selected>-- Memuat Siswa... --</option>
+    </select> 
+  </div>
+  <div>
+    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Kelas / Halqah</label>
+    <input type="text" id="input-kelas-display" readonly placeholder="Terisi Otomatis" class="w-full bg-slate-200 text-slate-600 px-3 py-2 border rounded-lg text-sm outline-none cursor-not-allowed font-medium">
+  </div>
+</div>
+
+            <!-- Notifikasi jika data otomatis terisi -->
+            <div id="autofill-alert" class="hidden p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-lg flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              <span>Target terisi otomatis sesuai <strong>Rencana WA</strong>. Silakan langsung berikan nilai!</span>
+            </div>
+
+            <!-- SETORAN ZIYADAH -->
+            <div class="border rounded-xl p-4 bg-white shadow-sm space-y-3 border-slate-200">
+              <h3 class="font-bold text-emerald-800 text-sm flex items-center gap-2 border-b pb-2">
+                <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i> Setoran Ziyadah (Hafalan Baru)
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="relative">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Dari (Surat : Ayat)</label>
+                  <input type="text" id="ziyadah-dari-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'ziyadah-dari-dropdown')" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <div id="ziyadah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div class="relative">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Sampai (Surat : Ayat)</label>
+                  <input type="text" id="ziyadah-sampai-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'ziyadah-sampai-dropdown')" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <div id="ziyadah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Nilai Ziyadah (0 - 100)</label>
+                  <input type="number" id="ziyadah-nilai-angka" min="0" max="100" placeholder="0 - 100" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                </div>
+              </div>
+            </div>
+
+            <!-- SETORAN MURAJA'AH -->
+            <div class="border rounded-xl p-4 bg-white shadow-sm space-y-3 border-slate-200">
+              <h3 class="font-bold text-emerald-800 text-sm flex items-center gap-2 border-b pb-2">
+                <i data-lucide="refresh-cw" class="w-4 h-4 text-emerald-600"></i> Setoran Muraja'ah (Pengulangan)
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="relative">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Dari (Surat : Ayat)</label>
+                  <input type="text" id="murajaah-dari-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'murajaah-dari-dropdown')" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <div id="murajaah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div class="relative">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Sampai (Surat : Ayat)</label>
+                  <input type="text" id="murajaah-sampai-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'murajaah-sampai-dropdown')" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <div id="murajaah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Nilai Muraja'ah (A-D)</label>
+                  <select id="murajaah-nilai" class="w-full bg-white border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                    <option value="" disabled selected>-- Pilih --</option>
+                    <option value="A">A (Sangat Baik)</option>
+                    <option value="B">B (Baik)</option>
+                    <option value="C">C (Cukup)</option>
+                    <option value="D">D (Perlu Bimbingan)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SETORAN TAHSIN / IQRO -->
+            <div class="border rounded-xl p-4 bg-white shadow-sm space-y-3 border-slate-200">
+              <h3 class="font-bold text-emerald-800 text-sm flex items-center gap-2 border-b pb-2">
+                <i data-lucide="book-open-check" class="w-4 h-4 text-emerald-600"></i> Setoran Tahsin / Iqro
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="relative">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Dari (Iqro / Surat : Ayat)</label>
+                  <input type="text" id="tahsin-dari-input" autocomplete="off" placeholder="Ketik iqro atau surat..." oninput="handleCombinedFilter(this, 'tahsin-dari-dropdown')" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <div id="tahsin-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div class="relative">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Sampai (Iqro / Surat : Ayat)</label>
+                  <input type="text" id="tahsin-sampai-input" autocomplete="off" placeholder="Ketik iqro atau surat..." oninput="handleCombinedFilter(this, 'tahsin-sampai-dropdown')" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <div id="tahsin-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Nilai Tahsin/Iqro (0 - 100)</label>
+                  <input type="number" id="tahsin-nilai-angka" min="0" max="100" placeholder="0 - 100" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                </div>
+              </div>
+            </div>
+
+            <!-- PENILAIAN ADAB & KEDISIPLINAN -->
+            <div class="border rounded-xl p-4 bg-white shadow-sm space-y-3 border-slate-200">
+              <h3 class="font-bold text-emerald-800 text-sm flex items-center gap-2 border-b pb-2">
+                <i data-lucide="award" class="w-4 h-4 text-emerald-600"></i> Penilaian Adab & Kedisiplinan
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Nilai Adab (A-D)</label>
+                  <select id="adab-nilai-dropdown" required class="w-full bg-white border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                    <option value="" disabled selected>-- Pilih Predikat --</option>
+                    <option value="A">A (Sangat Baik / Sangat Santun)</option>
+                    <option value="B">B (Baik / Sopan)</option>
+                    <option value="C">C (Cukup / Perlu Ditingkatkan)</option>
+                    <option value="D">D (Kurang / Perlu Perhatian)</option>
+                  </select>
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Sikap & Adab</label>
+                  <input type="text" id="adab-catatan" placeholder="cth: Sangat tertib dan sopan saat mengaji" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+              </div>
+            </div>
+
+           <!-- CATATAN EVALUASI GURU (MULTI-SELECT SUPPORT) -->
+<div class="border rounded-xl p-4 bg-slate-50 shadow-sm space-y-4 border-slate-200">
+  <h3 class="font-bold text-emerald-800 text-sm flex items-center gap-2 border-b pb-2">
+    <i data-lucide="message-square" class="w-4 h-4 text-emerald-600"></i> Catatan & Evaluasi Guru
+  </h3>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    
+    <!-- Multi-select Tajwid -->
+    <div class="relative">
+      <label class="block text-xs font-semibold text-slate-600 mb-1">Evaluasi Tajwid (Bisa Pilih >1)</label>
+      <button type="button" onclick="toggleMultiSelect('dropdown-tajwid')" class="w-full bg-white border rounded-lg px-3 py-2 text-sm text-left flex justify-between items-center focus:ring-2 focus:ring-emerald-500 outline-none">
+        <span id="label-tajwid" class="truncate text-slate-500">- Tidak Ada Perbaikan -</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+      </button>
+
+      <div id="dropdown-tajwid" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 p-2 space-y-1 max-h-48 overflow-y-auto">
+        <label class="flex items-center gap-2 p-1.5 text-xs hover:bg-slate-50 rounded cursor-pointer">
+          <input type="checkbox" value="Panjang Pendek (Mad)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+          Panjang Pendek (Mad)
+        </label>
+        <label class="flex items-center gap-2 p-1.5 text-xs hover:bg-slate-50 rounded cursor-pointer">
+          <input type="checkbox" value="Gunnah (Dengung)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+          Gunnah (Dengung)
+        </label>
+        <label class="flex items-center gap-2 p-1.5 text-xs hover:bg-slate-50 rounded cursor-pointer">
+          <input type="checkbox" value="Qolqolah (Pantulan)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+          Qolqolah (Pantulan)
+        </label>
+        <label class="flex items-center gap-2 p-1.5 text-xs hover:bg-slate-50 rounded cursor-pointer">
+          <input type="checkbox" value="Ikhfa (Samar)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+          Ikhfa (Samar)
+        </label>
+        <label class="flex items-center gap-2 p-1.5 text-xs hover:bg-slate-50 rounded cursor-pointer">
+          <input type="checkbox" value="Waqaf (Tanda Berhenti)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+          Waqaf (Tanda Berhenti)
+        </label>
+      </div>
+    </div>
+
+    <!-- Multi-select Pelafalan Huruf -->
+    <div class="relative">
+      <label class="block text-xs font-semibold text-slate-600 mb-1">Perbaikan Pelafalan Huruf (Bisa Pilih >1)</label>
+      <button type="button" onclick="toggleMultiSelect('dropdown-pelafalan')" class="w-full bg-white border rounded-lg px-3 py-2 text-sm text-left flex justify-between items-center focus:ring-2 focus:ring-emerald-500 outline-none">
+        <span id="label-pelafalan" class="truncate text-slate-500">- Semua Huruf Sesuai -</span>
+        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+      </button>
+
+      <div id="dropdown-pelafalan" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 p-2 space-y-1 max-h-48 overflow-y-auto">
+        <div id="container-chk-pelafalan" class="space-y-1">
+          <!-- Opsi huruf Hijaiyyah di-generate otomatis via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Perbaikan Kelancaran -->
+<!-- Multi-Select Autocomplete Kelancaran -->
+<div class="relative">
+  <label class="block text-xs font-semibold text-slate-600 mb-1">
+    Perlu Perbaikan Kelancaran (Bisa >1)
+  </label>
+  
+  <!-- Container untuk Tag Badge dan Input Text -->
+  <div id="kelancaran-container" onclick="document.getElementById('catatan-kelancaran-input').focus()" class="w-full bg-white border rounded-lg p-1.5 flex flex-wrap gap-1.5 items-center min-h-[42px] focus-within:ring-2 focus-within:ring-emerald-500 border-slate-300 cursor-text">
+    
+    <!-- Badges/Tags yang terpilih akan dirender di sini via JS -->
+    <div id="kelancaran-tags" class="flex flex-wrap gap-1.5"></div>
+    
+    <!-- Input Autocomplete -->
+    <input type="text" id="catatan-kelancaran-input" autocomplete="off" placeholder="Ketik Surat : Ayat..." oninput="handleQuranFilterMulti(this)" class="bg-transparent text-sm outline-none flex-1 min-w-[120px] px-1 py-0.5">
+  </div>
+
+  <!-- Dropdown Autocomplete Hasil Pencarian -->
+  <div id="kelancaran-dropdown" class="autocomplete-dropdown hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto text-xs"></div>
+</div>
+
+  <div>
+    <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Tambahan Ustaz/Ustazah</label>
+    <textarea id="catatan-guru-tambahan" rows="2" placeholder="Masukkan bimbingan khusus..." class="w-full bg-white border rounded-lg p-3 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+  </div>
+</div>
+
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2">
+              <i data-lucide="save" class="w-5 h-5"></i> Simpan Mutabaah Harian
+            </button>
+          </form>
+
+        </div>
+      </section>
+
+<!-- LAPORAN PDF -->
+<section id="page-report" class="page space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900">Laporan Bulanan Siswa</h2>
+      <p class="text-slate-500 text-sm">Pilih siswa dan bulan untuk melihat ringkasan perkembangan hafalan.</p>
+    </div>
+    <button onclick="downloadPDF()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 flex items-center gap-2 transition-colors">
+      <i data-lucide="download"></i> Export ke PDF
+    </button>
+  </div>
+
+  <!-- FILTER & INPUT MANUAL -->
+  <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Filter Kelas</label>
+        <select id="report-filter-kelas" onchange="filterSiswaByKelas('report-filter-kelas', 'report-filter-siswa')" class="select-kelas-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+          <option value="">-- Semua Kelas --</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Siswa (Otomatis)</label>
+        <select id="report-filter-siswa" onchange="updateReportSiswaInfo(); loadReportData();" class="select-siswa-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+          <option value="" disabled selected>-- Memuat Siswa... --</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Bulan & Tahun</label>
+        <input type="month" id="report-filter-bulan" onchange="loadReportData()" class="w-full bg-slate-50 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+      </div>
+      <div class="flex items-end">
+        <button onclick="loadReportData()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium h-[38px] rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
+          <i data-lucide="filter" class="w-4 h-4"></i> Tampilkan
+        </button>
+      </div>
+    </div>
+
+    <!-- INPUT MANUAL TAMBAHAN -->
+    <div class="border-t pt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Semester (Input Manual)</label>
+        <input type="text" id="manual-input-semester" oninput="updateReportManualInputs()" value="1 (SATU)" placeholder="Contoh: 1 (SATU)" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tahun Pelajaran (Input Manual)</label>
+        <input type="text" id="manual-input-thn-ajaran" oninput="updateReportManualInputs()" value="2025/2026" placeholder="Contoh: 2025/2026" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-semibold text-amber-800 uppercase mb-1 flex items-center gap-1">
+          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Catatan / Evaluasi Guru (Input Manual)
+        </label>
+        <textarea id="report-input-evaluasi" oninput="updateReportManualInputs()" rows="2" placeholder="Tuliskan evaluasi bulanan di sini..." class="w-full bg-amber-50/50 border border-amber-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+      </div>
+    </div>
+  </div>
+
+ <!-- HASIL PREVIEW TAMPILAN LAPORAN PDF -->
+<div class="bg-slate-200 p-4 md:p-8 rounded-xl overflow-x-auto flex justify-center">
+  <div id="pdf-content" class="bg-white p-8 md:p-12 rounded-sm shadow-xl w-full max-w-[800px] text-slate-800 space-y-6">
+    
+    <!-- BANNER HEADER SCHOOL -->
+    <div class="w-full flex justify-center">
+      <img src="kopbisc.PNG" alt="Header Bandung Islamic School" class="w-full h-auto object-contain rounded-sm mx-auto" />
+    </div>
+
+    <!-- JUDUL RAPOR -->
+    <div class="text-center space-y-1 my-4 border-b border-slate-200 pb-3">
+      <h2 class="text-xl font-bold font-serif dir-rtl text-center">كشف الدرجات لتحفيظ القرآن</h2>
+      <h1 class="text-lg font-extrabold text-slate-900 tracking-wide uppercase text-center">LAPORAN BULANAN TAHFIZH DAN TAHSIN AL QURAN</h1>
+      <p id="report-periode" class="text-xs font-semibold text-slate-600 text-center">Periode: -</p>
+    </div>
+
+    <!-- INFORMASI SISWA & AKADEMIK -->
+    <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-semibold text-slate-800 uppercase border-b border-slate-300 pb-4 max-w-[650px] mx-auto">
+      <div class="space-y-1.5">
+        <div class="flex justify-start"><span class="w-28 shrink-0 text-left">NAMA SISWA/I</span><span>: <strong id="report-siswa-nama">-</strong></span></div>
+        <div class="flex justify-start"><span class="w-28 shrink-0 text-left">NIS/NIPD</span><span>: <span id="report-siswa-nis">-</span></span></div>
+        <div class="flex justify-start"><span class="w-28 shrink-0 text-left">KELAS</span><span>: <span id="report-siswa-kelas">-</span></span></div>
+      </div>
+      <div class="space-y-1.5 pl-4">
+        <div class="flex justify-start"><span class="w-32 shrink-0 text-left">SEMESTER</span><span>: <span id="report-semester">1 (SATU)</span></span></div>
+        <div class="flex justify-start"><span class="w-32 shrink-0 text-left">TAHUN PELAJARAN</span><span>: <span id="report-thn-ajaran">2025/2026</span></span></div>
+        <div class="flex justify-start"><span class="w-32 shrink-0 text-left">GURU TAHFIZH</span><span>: <span id="report-guru-nama">-</span></span></div>
+      </div>
+    </div>
+
+    <!-- A. TABEL ASPEK TAHFIZH (ZIYADAH) BULANAN -->
+    <div>
+      <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">A. Aspek Hafalan Baru (Ziyadah)</h4>
+      <table class="w-full text-xs border-collapse border border-slate-300">
+        <thead>
+          <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
+            <th class="p-2 border border-slate-300 w-[10%]">No</th>
+            <th class="p-2 border border-slate-300 w-[37.5%]">Dari (Awal)</th>
+            <th class="p-2 border border-slate-300 w-[37.5%]">Sampai (Akhir)</th>
+            <th class="p-2 border border-slate-300 w-[15%]">Nilai</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-tahfizh" class="text-center">
+          <tr>
+            <td colspan="4" class="p-4 text-center text-slate-400">Silakan pilih siswa dan bulan untuk menampilkan data.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- B. TABEL ASPEK TAHSIN / IQRO BULANAN -->
+    <div>
+      <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">B. Aspek Capaian Tahsin / Iqro</h4>
+      <table class="w-full text-xs border-collapse border border-slate-300">
+        <thead>
+          <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
+            <th class="p-2 border border-slate-300 w-[10%]">No</th>
+            <th class="p-2 border border-slate-300 w-[37.5%]">Dari (Awal)</th>
+            <th class="p-2 border border-slate-300 w-[37.5%]">Sampai (Akhir)</th>
+            <th class="p-2 border border-slate-300 w-[15%]">Nilai</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-tahsin" class="text-center">
+          <tr>
+            <td colspan="4" class="p-4 text-center text-slate-400">Silakan pilih siswa dan bulan untuk menampilkan data.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- C. TABEL PENILAIAN MURAJA'AH & ADAB (DIBUAT BARU DI BAWAH TAHSIN) -->
+    <div>
+      <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">C. Penilaian Muraja'ah & Adab Bulanan</h4>
+      <table class="w-full text-xs border-collapse border border-slate-300 mb-3">
+        <thead>
+          <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
+            <th class="p-2 border border-slate-300 w-[10%]">No</th>
+            <th class="p-2 border border-slate-300 w-[40%] text-left">Materi Penilaian</th>
+            <th class="p-2 border border-slate-300 w-[20%]">Nilai Rata-rata</th>
+            <th class="p-2 border border-slate-300 w-[30%]">Predikat</th>
+          </tr>
+        </thead>
+        <tbody class="text-center">
+          <tr class="border-b border-slate-200">
+            <td class="p-2 border border-slate-300">1</td>
+            <td class="p-2 border border-slate-300 text-left font-medium">Adab & Kedisiplinan</td>
+            <td id="adab-mutu" class="p-2 border border-slate-300 font-bold">-</td>
+            <td id="adab-predikat" class="p-2 border border-slate-300">-</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="p-2 border border-slate-300">2</td>
+            <td class="p-2 border border-slate-300 text-left font-medium">Kelancaran Muraja'ah</td>
+            <td id="murajaah-mutu" class="p-2 border border-slate-300 font-bold">-</td>
+            <td id="murajaah-predikat" class="p-2 border border-slate-300">-</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Ringkasan Target Capaian -->
+      <div class="bg-slate-50 p-2.5 rounded border border-slate-300 text-xs grid grid-cols-3 text-center gap-2">
+        <div>
+          <span class="block text-slate-500 text-[10px] uppercase">Target Capaian:</span>
+          <strong id="target-capaian" class="text-slate-800">-</strong>
+        </div>
+        <div>
+          <span class="block text-slate-500 text-[10px] uppercase">Pencapaian Siswa:</span>
+          <strong id="pencapaian-siswa" class="text-slate-800">-</strong>
+        </div>
+        <div>
+          <span class="block text-slate-500 text-[10px] uppercase">Keterangan:</span>
+          <strong id="keterangan-capaian" class="text-emerald-700 font-bold">-</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATATAN & TANDA TANGAN -->
+    <div class="pt-4 border-t border-slate-200 grid grid-cols-2 gap-8 items-start">
+      <div class="text-xs text-center">
+        <p class="font-bold mb-1 text-center">Catatan Guru / Evaluasi:</p>
+        <p id="report-catatan" class="italic text-slate-600 bg-slate-50 p-3 rounded border border-slate-200 text-center">Terus tingkatkan semangat muroja'ah di rumah.</p>
+      </div>
+      <div class="text-center text-xs space-y-10">
+        <p><span id="report-tanggal-cetak"></span><br>Guru Tahfizh</p>
+        <p id="report-ttd-guru" class="font-bold underline text-slate-900 text-center">-</p>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</section>
+    </main>
+  </div>
+
+  <script>
+    // MASUKKAN SCRIPT URL ANDA:
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxdKmVYb5WoKvCVAmGjwE6Ta0030ot_nzHUBocGqGoutEbeGxxbfOuauAvNCfwrOmOj/exec";
+
+    let currentUser = null;
+    let loadedSiswaData = [];
+
+ const quranData = [
+  { id: 1, name: "1. Al-Fatihah", totalAyat: 7 },
+  { id: 2, name: "2. Al-Baqarah", totalAyat: 286 },
+  { id: 3, name: "3. Ali 'Imran", totalAyat: 200 },
+  { id: 4, name: "4. An-Nisa'", totalAyat: 176 },
+  { id: 5, name: "5. Al-Ma'idah", totalAyat: 120 },
+  { id: 6, name: "6. Al-An'am", totalAyat: 165 },
+  { id: 7, name: "7. Al-A'raf", totalAyat: 206 },
+  { id: 8, name: "8. Al-Anfal", totalAyat: 75 },
+  { id: 9, name: "9. At-Taubah", totalAyat: 129 },
+  { id: 10, name: "10. Yunus", totalAyat: 109 },
+  { id: 11, name: "11. Hud", totalAyat: 123 },
+  { id: 12, name: "12. Yusuf", totalAyat: 111 },
+  { id: 13, name: "13. Ar-Ra'd", totalAyat: 43 },
+  { id: 14, name: "14. Ibrahim", totalAyat: 52 },
+  { id: 15, name: "15. Al-Hijr", totalAyat: 99 },
+  { id: 16, name: "16. An-Nahl", totalAyat: 128 },
+  { id: 17, name: "17. Al-Isra'", totalAyat: 111 },
+  { id: 18, name: "18. Al-Kahf", totalAyat: 110 },
+  { id: 19, name: "19. Maryam", totalAyat: 98 },
+  { id: 20, name: "20. Taha", totalAyat: 135 },
+  { id: 21, name: "21. Al-Anbiya'", totalAyat: 112 },
+  { id: 22, name: "22. Al-Hajj", totalAyat: 78 },
+  { id: 23, name: "23. Al-Mu'minun", totalAyat: 118 },
+  { id: 24, name: "24. An-Nur", totalAyat: 64 },
+  { id: 25, name: "25. Al-Furqan", totalAyat: 77 },
+  { id: 26, name: "26. Asy-Syu'ara'", totalAyat: 227 },
+  { id: 27, name: "27. An-Naml", totalAyat: 93 },
+  { id: 28, name: "28. Al-Qasas", totalAyat: 88 },
+  { id: 29, name: "29. Al-'Ankabut", totalAyat: 69 },
+  { id: 30, name: "30. Ar-Rum", totalAyat: 60 },
+  { id: 31, name: "31. Luqman", totalAyat: 34 },
+  { id: 32, name: "32. As-Sajdah", totalAyat: 30 },
+  { id: 33, name: "33. Al-Ahzab", totalAyat: 73 },
+  { id: 34, name: "34. Saba'", totalAyat: 54 },
+  { id: 35, name: "35. Fatir", totalAyat: 45 },
+  { id: 36, name: "36. Yasin", totalAyat: 83 },
+  { id: 37, name: "37. As-Saffat", totalAyat: 182 },
+  { id: 38, name: "38. Sad", totalAyat: 88 },
+  { id: 39, name: "39. Az-Zumar", totalAyat: 75 },
+  { id: 40, name: "40. Ghafir", totalAyat: 85 },
+  { id: 41, name: "41. Fussilat", totalAyat: 54 },
+  { id: 42, name: "42. Asy-Syura", totalAyat: 53 },
+  { id: 43, name: "43. Az-Zukhruf", totalAyat: 89 },
+  { id: 44, name: "44. Ad-Dukhan", totalAyat: 59 },
+  { id: 45, name: "45. Al-Jasiyah", totalAyat: 37 },
+  { id: 46, name: "46. Al-Ahqaf", totalAyat: 35 },
+  { id: 47, name: "47. Muhammad", totalAyat: 38 },
+  { id: 48, name: "48. Al-Fath", totalAyat: 29 },
+  { id: 49, name: "49. Al-Hujurat", totalAyat: 18 },
+  { id: 50, name: "50. Qaf", totalAyat: 45 },
+  { id: 51, name: "51. Az-Zariyat", totalAyat: 60 },
+  { id: 52, name: "52. At-Tur", totalAyat: 49 },
+  { id: 53, name: "53. An-Najm", totalAyat: 62 },
+  { id: 54, name: "54. Al-Qamar", totalAyat: 55 },
+  { id: 55, name: "55. Ar-Rahman", totalAyat: 78 },
+  { id: 56, name: "56. Al-Waqi'ah", totalAyat: 96 },
+  { id: 57, name: "57. Al-Hadid", totalAyat: 29 },
+  { id: 58, name: "58. Al-Mujadilah", totalAyat: 22 },
+  { id: 59, name: "59. Al-Hasyr", totalAyat: 24 },
+  { id: 60, name: "60. Al-Mumtahanah", totalAyat: 13 },
+  { id: 61, name: "61. As-Saff", totalAyat: 14 },
+  { id: 62, name: "62. Al-Jumu'ah", totalAyat: 11 },
+  { id: 63, name: "63. Al-Munafiqun", totalAyat: 11 },
+  { id: 64, name: "64. At-Taghabun", totalAyat: 18 },
+  { id: 65, name: "65. At-Talaq", totalAyat: 12 },
+  { id: 66, name: "66. At-Tahrim", totalAyat: 12 },
+  { id: 67, name: "67. Al-Mulk", totalAyat: 30 },
+  { id: 68, name: "68. Al-Qalam", totalAyat: 52 },
+  { id: 69, name: "69. Al-Haqqah", totalAyat: 52 },
+  { id: 70, name: "70. Al-Ma'arij", totalAyat: 44 },
+  { id: 71, name: "71. Nuh", totalAyat: 28 },
+  { id: 72, name: "72. Al-Jinn", totalAyat: 28 },
+  { id: 73, name: "73. Al-Muzzammil", totalAyat: 20 },
+  { id: 74, name: "74. Al-Muddassir", totalAyat: 56 },
+  { id: 75, name: "75. Al-Qiyamah", totalAyat: 40 },
+  { id: 76, name: "76. Al-Insan", totalAyat: 31 },
+  { id: 77, name: "77. Al-Mursalat", totalAyat: 50 },
+  { id: 78, name: "78. An-Naba'", totalAyat: 40 },
+  { id: 79, name: "79. An-Nazi'at", totalAyat: 46 },
+  { id: 80, name: "80. 'Abasa", totalAyat: 42 },
+  { id: 81, name: "81. At-Takwir", totalAyat: 29 },
+  { id: 82, name: "82. Al-Infitar", totalAyat: 19 },
+  { id: 83, name: "83. Al-Mutaffifin", totalAyat: 36 },
+  { id: 84, name: "84. Al-Insyiqaq", totalAyat: 25 },
+  { id: 85, name: "85. Al-Buruj", totalAyat: 22 },
+  { id: 86, name: "86. At-Tariq", totalAyat: 17 },
+  { id: 87, name: "87. Al-A'la", totalAyat: 19 },
+  { id: 88, name: "88. Al-Ghasyiyah", totalAyat: 26 },
+  { id: 89, name: "89. Al-Fajr", totalAyat: 30 },
+  { id: 90, name: "90. Al-Balad", totalAyat: 20 },
+  { id: 91, name: "91. Asy-Syams", totalAyat: 15 },
+  { id: 92, name: "92. Al-Lail", totalAyat: 21 },
+  { id: 93, name: "93. Ad-Duha", totalAyat: 11 },
+  { id: 94, name: "94. Asy-Syarh", totalAyat: 8 },
+  { id: 95, name: "95. At-Tin", totalAyat: 8 },
+  { id: 96, name: "96. Al-'Alaq", totalAyat: 19 },
+  { id: 97, name: "97. Al-Qadr", totalAyat: 5 },
+  { id: 98, name: "98. Al-Bayyinah", totalAyat: 8 },
+  { id: 99, name: "99. Az-Zalzalah", totalAyat: 8 },
+  { id: 100, name: "100. Al-'Adiyat", totalAyat: 11 },
+  { id: 101, name: "101. Al-Qari'ah", totalAyat: 11 },
+  { id: 102, name: "102. At-Takasur", totalAyat: 8 },
+  { id: 103, name: "103. Al-'Asr", totalAyat: 3 },
+  { id: 104, name: "104. Al-Humazah", totalAyat: 9 },
+  { id: 105, name: "105. Al-Fil", totalAyat: 5 },
+  { id: 106, name: "106. Quraisy", totalAyat: 4 },
+  { id: 107, name: "107. Al-Ma'un", totalAyat: 7 },
+  { id: 108, name: "108. Al-Kausar", totalAyat: 3 },
+  { id: 109, name: "109. Al-Kafirun", totalAyat: 6 },
+  { id: 110, name: "110. An-Nasr", totalAyat: 3 },
+  { id: 111, name: "111. Al-Lahab", totalAyat: 5 },
+  { id: 112, name: "112. Al-Ikhlas", totalAyat: 4 },
+  { id: 113, name: "113. Al-Falaq", totalAyat: 5 },
+  { id: 114, name: "114. An-Nas", totalAyat: 6 }
+];
+
+    const fullQuranOptions = [];
+    quranData.forEach(surah => {
+      for (let i = 1; i <= surah.totalAyat; i++) {
+        fullQuranOptions.push(`${surah.name} : Ayat ${i}`);
+      }
+    });
+
+    const fullIqroOnlyOptions = [];
+    const iqroList = ["Iqro 1", "Iqro 2", "Iqro 3", "Iqro 4", "Iqro 5", "Iqro 6"];
+    iqroList.forEach(level => {
+      for (let p = 1; p <= 31; p++) {
+        fullIqroOnlyOptions.push(`${level} : Halaman ${p}`);
+      }
+    });
+
+    const combinedTahsinIqroOptions = [...fullIqroOnlyOptions, ...fullQuranOptions];
+
+    const hijaiyyahList = [
+      "Alif (ا)", "Ba (ب)", "Ta (ت)", "Tha (ث)", "Jim (ج)", "Ha (ح)", "Kha (خ)",
+      "Dal (د)", "Dzal (ذ)", "Ra (ر)", "Zai (ز)", "Sin (س)", "Syin (ش)", "Shad (ص)",
+      "Dhad (ض)", "Tha (ط)", "Zha (ظ)", "'Ain (ع)", "Ghain (غ)", "Fa (ف)", "Qaf (ق)",
+      "Kaf (ك)", "Lam (ل)", "Mim (م)", "Nun (ن)", "Wawu (و)", "Ha (هـ)", "Ya (ي)"
+    ];
+
+   window.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  
+  const today = new Date().toISOString().split('T')[0];
+  const todayInput = document.getElementById('input-tanggal');
+  const targetInput = document.getElementById('wa-tanggal-target');
+  if (todayInput) todayInput.value = today;
+  if (targetInput) targetInput.value = today;
+
+  generateWaText();
+
+  const monthInput = document.getElementById('report-filter-bulan');
+  if (monthInput) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    monthInput.value = `${year}-${month}`;
+  }
+
+  // Tambahkan event listener Enter/Koma pada input kelancaran
+const kelancaranInput = document.getElementById('catatan-kelancaran-input');
+if (kelancaranInput) {
+  kelancaranInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = this.value.trim().replace(/,/g, '');
+      if (val) {
+        addKelancaranTag(val);
+      }
+    } else if (e.key === 'Backspace' && this.value === '' && selectedKelancaranList.length > 0) {
+      // Hapus tag terakhir jika tombol backspace ditekan saat kolom kosong
+      selectedKelancaranList.pop();
+      renderKelancaranTags();
+    }
+  });
+}
+
+  const tglCetak = document.getElementById('report-tanggal-cetak');
+  if (tglCetak) tglCetak.innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Generate Checkbox Pelafalan Huruf (Hijaiyyah)
+  const containerPelafalan = document.getElementById('container-chk-pelafalan');
+  if (containerPelafalan) {
+    containerPelafalan.innerHTML = ''; // bersihkan kontainer dulu jika ada isi awal
+    hijaiyyahList.forEach(huruf => {
+      const label = document.createElement('label');
+      label.className = 'flex items-center gap-2 p-1.5 text-xs hover:bg-slate-50 rounded cursor-pointer';
+      label.innerHTML = `
+        <input type="checkbox" value="${huruf}" onchange="updateMultiSelect('pelafalan')" class="chk-pelafalan rounded text-emerald-600 focus:ring-emerald-500">
+        ${huruf}
+      `;
+      containerPelafalan.appendChild(label);
+    });
+  }
+
+  // Handle klik di luar area untuk menutup dropdown autocomplete & multi-select
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.relative')) {
+      document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.classList.add('hidden'));
+      
+      const dropTajwid = document.getElementById('dropdown-tajwid');
+      const dropPelafalan = document.getElementById('dropdown-pelafalan');
+      if (dropTajwid) dropTajwid.classList.add('hidden');
+      if (dropPelafalan) dropPelafalan.classList.add('hidden');
+    }
+  });
+
+  fetchSiswaFromScript();
+  fetchKelasAndGuru();
+});
+
+function toggleMultiSelect(dropdownId) {
+  const target = document.getElementById(dropdownId);
+  const isHidden = target.classList.contains('hidden');
+  
+  // Sembunyikan dropdown lain dulu
+  document.getElementById('dropdown-tajwid')?.classList.add('hidden');
+  document.getElementById('dropdown-pelafalan')?.classList.add('hidden');
+
+  if (isHidden) {
+    target.classList.remove('hidden');
+  }
+}
+
+function updateMultiSelect(type) {
+  const checkboxes = document.querySelectorAll(`.chk-${type}:checked`);
+  const values = Array.from(checkboxes).map(cb => cb.value);
+  const labelEl = document.getElementById(`label-${type}`);
+
+  if (values.length === 0) {
+    labelEl.innerText = type === 'tajwid' ? '- Tidak Ada Perbaikan -' : '- Semua Huruf Sesuai -';
+    labelEl.classList.add('text-slate-500');
+    labelEl.classList.remove('text-slate-800', 'font-semibold');
+  } else {
+    labelEl.innerText = values.join(', ');
+    labelEl.classList.remove('text-slate-500');
+    labelEl.classList.add('text-slate-800', 'font-semibold');
+  }
+}
+
+    async function sendToSpreadsheet(payload) {
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        return await res.json();
+      } catch (err) {
+        console.error("Gagal mengirim data:", err);
+        return { result: "error", message: err.toString() };
+      }
+    }
+
+   // 1. UPDATE FUNGSI HANDLE LOGIN
+async function handleLogin(e) {
+  e.preventDefault();
+  const role = document.getElementById('login-role').value;
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+
+  const btnSubmit = document.getElementById('btn-login-submit');
+  btnSubmit.innerText = "Memverifikasi...";
+  btnSubmit.disabled = true;
+
+  const res = await sendToSpreadsheet({
+    action: "login",
+    username: username,
+    password: password,
+    role: role
+  });
+
+  btnSubmit.innerText = "Masuk ke Dashboard";
+  btnSubmit.disabled = false;
+
+  if (res && res.result === "success") {
+    currentUser = res.user;
+    document.getElementById('user-badge').innerText = role.toUpperCase();
+
+    const masterNav = document.getElementById('nav-master-data');
+    if (role === 'admin') {
+      masterNav.classList.remove('hidden');
+    } else {
+      masterNav.classList.add('hidden');
+    }
+
+    // Di dalam fungsi handleLogin(e)
+if (res && res.result === "success") {
+  currentUser = res.user;
+  document.getElementById('user-badge').innerText = role.toUpperCase();
+
+  const masterNav = document.getElementById('nav-master-data');
+  if (role === 'admin') {
+    masterNav.classList.remove('hidden');
+  } else {
+    masterNav.classList.add('hidden');
+  }
+  
+  // Ambil data siswa untuk dropdown dan perbarui statistik dashboard
+  await fetchSiswaFromScript();
+  await fetchDashboardStats(); // <--- TAMBAHKAN BARIS INI
+
+  document.getElementById('page-login').classList.remove('active');
+  const appLayout = document.getElementById('app-layout');
+  appLayout.classList.remove('is-hidden');
+  appLayout.classList.add('is-visible');
+  
+  switchPage('dashboard');
+}
+    
+    // FETCH DATA SISWA SESUAI ROLE DAN USERNAME YANG LOGIN
+    await fetchSiswaFromScript();
+
+    document.getElementById('page-login').classList.remove('active');
+    const appLayout = document.getElementById('app-layout');
+    appLayout.classList.remove('is-hidden');
+    appLayout.classList.add('is-visible');
+    
+    switchPage('dashboard');
+  } else {
+    alert(res.message || "Login gagal! Periksa kembali username dan kata sandi.");
+  }
+}
+
+// 2. UPDATE FUNGSI FETCH SISWA FROM SCRIPT
+// 1. Simpan data siswa ke variabel global saat pertama dipanggil
+async function fetchSiswaFromScript() {
+  try {
+    let url = `${SCRIPT_URL}?action=getSiswa`;
+    
+    if (currentUser && currentUser.role === 'guru') {
+      url += `&role=${encodeURIComponent(currentUser.role)}&username=${encodeURIComponent(currentUser.username)}`;
+    }
+
+    const response = await fetch(url);
+    const json = await response.json();
+
+    if (json.result === "success" && json.data) {
+      loadedSiswaData = json.data; // Simpan data siswa ke variabel global
+      populateSiswaDropdowns(json.data);
+      
+      // Panggil pembaruan daftar kelas setelah data siswa berhasil dimuat
+      await fetchKelasAndGuru();
+    }
+  } catch (err) {
+    console.error("Gagal mengambil data siswa:", err);
+  }
+}
+
+// 2. Fungsi baru untuk menyaring siswa berdasarkan Kelas yang dipilih
+function filterSiswaByKelas(kelasSelectId, siswaSelectId) {
+  const selectedKelas = document.getElementById(kelasSelectId).value;
+  const targetSiswaSelect = document.getElementById(siswaSelectId);
+
+  if (!targetSiswaSelect) return;
+
+  let filteredList = loadedSiswaData;
+  if (selectedKelas) {
+    filteredList = loadedSiswaData.filter(s => s.kelas === selectedKelas);
+  }
+
+  targetSiswaSelect.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+  filteredList.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.nama;
+    opt.textContent = item.nama;
+    opt.setAttribute('data-kelas', item.kelas || '');
+    opt.setAttribute('data-wa', item.wa || '');
+    opt.setAttribute('data-nis', item.nis || '-');
+    targetSiswaSelect.appendChild(opt);
+  });
+
+  // Trigger event change jika fungsi autofill butuh dikosongkan
+  targetSiswaSelect.dispatchEvent(new Event('change'));
+}
+// 3. UPDATE FUNGSI HANDLE LOGOUT (SUPAYA FILTER DIBERSIHKAN SAAT LOGOUT)
+function handleLogout() {
+  currentUser = null;
+  loadedSiswaData = [];
+  document.getElementById('app-layout').classList.remove('is-visible');
+  document.getElementById('app-layout').classList.add('is-hidden');
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  document.getElementById('page-login').classList.add('active');
+}
+   async function fetchKelasAndGuru() {
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=getKelasAndGuru`);
+    const json = await response.json();
+    
+    if (json.result === "success") {
+      // 1. Populate Dropdown Guru
+      const selectGuru = document.querySelectorAll('.select-guru-list');
+      selectGuru.forEach(sel => {
+        sel.innerHTML = '<option value="" disabled selected>-- Pilih Guru --</option>';
+        json.guru.forEach(g => sel.appendChild(new Option(g, g)));
+      });
+
+      // 2. Filter Daftar Kelas berdasarkan Guru yang sedang Login
+      let listKelasUntukGuru = json.kelas || [];
+
+      // Jika user yang login adalah 'guru' dan kita memiliki data siswa yang dibimbingnya
+      if (currentUser && currentUser.role === 'guru' && Array.isArray(loadedSiswaData) && loadedSiswaData.length > 0) {
+        // Ambil daftar unik kelas HANYA dari siswa yang ada di daftar loadedSiswaData milik guru ini
+        const kelasSet = new Set(
+          loadedSiswaData
+            .map(s => s.kelas)
+            .filter(k => k && k.trim() !== '')
+        );
+        listKelasUntukGuru = Array.from(kelasSet);
+      }
+
+      // 3. Populate Dropdown Kelas
+      const selectKelas = document.querySelectorAll('.select-kelas-list');
+      selectKelas.forEach(sel => {
+        const isFilter = sel.id.includes('filter');
+        
+        sel.innerHTML = isFilter 
+          ? '<option value="">-- Semua Kelas --</option>' 
+          : '<option value="" disabled selected>-- Pilih Kelas --</option>';
+        
+        listKelasUntukGuru.forEach(k => sel.appendChild(new Option(k, k)));
+      });
+    }
+  } catch (err) {
+    console.error("Gagal mengambil data kelas/guru:", err);
+  }
+}
+
+    function populateSiswaDropdowns(siswaList) {
+      const selects = document.querySelectorAll('.select-siswa-list');
+      selects.forEach(select => {
+        select.innerHTML = '<option value="" disabled selected>-- Pilih Siswa --</option>';
+        siswaList.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.nama;
+          opt.textContent = item.nama;
+          opt.setAttribute('data-kelas', item.kelas || '');
+          opt.setAttribute('data-wa', item.wa || '');
+          opt.setAttribute('data-nis', item.nis || '-');
+          select.appendChild(opt);
+        });
+      });
+      updateSiswaKelas();
+    }
+
+    // UTILITAS RESET INPUT
+function clearFormMutabaah() {
+  const fields = [
+    'ziyadah-dari-input', 'ziyadah-sampai-input',
+    'tahsin-dari-input', 'tahsin-sampai-input',
+    'murajaah-dari-input', 'murajaah-sampai-input'
+  ];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+function clearFormTargetWA() {
+  const fields = [
+    'wa-tanggal-target', 'wa-ziyadah-dari', 'wa-ziyadah-sampai',
+    'wa-tahsin-dari', 'wa-tahsin-sampai', 'wa-murajaah-dari',
+    'wa-murajaah-sampai', 'wa-catatan'
+  ];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+// 1. OTOMATISASI PENGISIAN FORM MUTABAAH DARI RENCANA WA
+async function autoFillFromRencanaWA() {
+  const tanggal = document.getElementById('input-tanggal').value;
+  const siswa = document.getElementById('input-siswa').value;
+  const alertBox = document.getElementById('autofill-alert');
+
+  // Jika tanggal ATAU siswa belum dipilih
+  if (!tanggal || !siswa) {
+    clearFormMutabaah();
+    if (alertBox) alertBox.classList.add('hidden');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getTargetWA&siswa=${encodeURIComponent(siswa)}&tanggal=${encodeURIComponent(tanggal)}`);
+    const json = await res.json();
+    
+    if (json.result === "success" && json.data && json.data.ziyadahDari) {
+      const d = json.data;
+      document.getElementById('ziyadah-dari-input').value = d.ziyadahDari || '';
+      document.getElementById('ziyadah-sampai-input').value = d.ziyadahSampai || '';
+      document.getElementById('tahsin-dari-input').value = d.tahsinDari || '';
+      document.getElementById('tahsin-sampai-input').value = d.tahsinSampai || '';
+      document.getElementById('murajaah-dari-input').value = d.murajaahDari || '';
+      document.getElementById('murajaah-sampai-input').value = d.murajaahSampai || '';
+      
+      if (alertBox) alertBox.classList.remove('hidden');
+    } else {
+      // Data tidak ditemukan / belum ada
+      clearFormMutabaah();
+      if (alertBox) alertBox.classList.add('hidden');
+    }
+  } catch (err) {
+    console.error("Gagal melakukan autofill dari Rencana WA:", err);
+    clearFormMutabaah();
+    if (alertBox) alertBox.classList.add('hidden');
+  }
+}
+
+// 2. LOAD TARGET WA BERDASARKAN SISWA
+async function loadTargetWABySiswa() {
+  const siswaSelect = document.getElementById('wa-siswa');
+  const siswa = siswaSelect.value;
+  const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
+  const defaultWa = selectedOption ? selectedOption.getAttribute('data-wa') : '';
+
+  // Atur nomor WA dasar jika ada
+  document.getElementById('wa-nomor').value = defaultWa || '';
+
+  // Jika siswa belum dipilih, kosongkan semua input target WA
+  if (!siswa) {
+    clearFormTargetWA();
+    generateWaText();
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getTargetWA&siswa=${encodeURIComponent(siswa)}`);
+    const json = await res.json();
+
+    if (json.result === "success" && json.data) {
+      const d = json.data;
+      document.getElementById('wa-tanggal-target').value = d.tanggal || '';
+      document.getElementById('wa-nomor').value = d.wa || defaultWa || '';
+      document.getElementById('wa-ziyadah-dari').value = d.ziyadahDari || '';
+      document.getElementById('wa-ziyadah-sampai').value = d.ziyadahSampai || '';
+      document.getElementById('wa-tahsin-dari').value = d.tahsinDari || '';
+      document.getElementById('wa-tahsin-sampai').value = d.tahsinSampai || '';
+      document.getElementById('wa-murajaah-dari').value = d.murajaahDari || '';
+      document.getElementById('wa-murajaah-sampai').value = d.murajaahSampai || '';
+      document.getElementById('wa-catatan').value = d.catatan || '';
+    } else {
+      // Jika respons sukses tapi data siswa ini belum ada di spreadsheet
+      clearFormTargetWA();
+    }
+    generateWaText();
+  } catch (err) {
+    console.error("Gagal memuat target WA:", err);
+    clearFormTargetWA();
+    generateWaText();
+  }
+}
+
+    async function saveRencanaWA() {
+      const payload = {
+        action: "addRencanaWA",
+        tanggalTarget: document.getElementById('wa-tanggal-target').value,
+        siswa: document.getElementById('wa-siswa').value,
+        wa: document.getElementById('wa-nomor').value,
+        targetZiyadahDari: document.getElementById('wa-ziyadah-dari').value,
+        targetZiyadahSampai: document.getElementById('wa-ziyadah-sampai').value,
+        targetTahsinDari: document.getElementById('wa-tahsin-dari').value,
+        targetTahsinSampai: document.getElementById('wa-tahsin-sampai').value,
+        targetMurajaahDari: document.getElementById('wa-murajaah-dari').value,
+        targetMurajaahSampai: document.getElementById('wa-murajaah-sampai').value,
+        catatan: document.getElementById('wa-catatan').value
+      };
+
+      const res = await sendToSpreadsheet(payload);
+      if (res && res.result === "success") {
+        alert("Rencana Target WA berhasil tersimpan ke Google Sheets!");
+      }
+    }
+
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      const targetPage = document.getElementById(`page-${pageId}`);
+      if (targetPage) targetPage.classList.add('active');
+    }
+
+    async function handleMasterSubmit(e, dataName) {
+      e.preventDefault();
+      const form = e.target;
+      let payload = { action: "add" + dataName };
+
+      if (dataName === 'Siswa') {
+        payload.nama = document.getElementById('master-siswa-nama').value;
+        payload.nis = document.getElementById('master-siswa-nis').value;
+        payload.kelas = document.getElementById('master-siswa-kelas').value;
+        payload.wa = document.getElementById('master-siswa-wa').value;
+      } else if (dataName === 'Guru') {
+        payload.nama = document.getElementById('master-guru-nama').value;
+        payload.nip = document.getElementById('master-guru-nip').value;
+        payload.wa = document.getElementById('master-guru-wa').value;
+      } else if (dataName === 'Kelas') {
+        payload.nama = document.getElementById('master-kelas-nama').value;
+        payload.guru = document.getElementById('master-kelas-guru').value;
+      } else if (dataName === 'User') {
+        payload.username = document.getElementById('master-user-name').value;
+        payload.password = document.getElementById('master-user-pass').value;
+        payload.role = document.getElementById('master-user-role').value;
+      }
+
+      // Di dalam fungsi handleMasterSubmit(e, dataName)
+if (res && res.result === "success") {
+  alert(`Data ${dataName} berhasil tersimpan!`);
+  form.reset();
+  if (dataName === 'Siswa') {
+    fetchSiswaFromScript();
+    fetchDashboardStats(); // <--- TAMBAHKAN BARIS INI
+  }
+  if (dataName === 'Guru' || dataName === 'Kelas') fetchKelasAndGuru();
+}
+
+      const res = await sendToSpreadsheet(payload);
+      if (res && res.result === "success") {
+        alert(`Data ${dataName} berhasil tersimpan!`);
+        form.reset();
+        if (dataName === 'Siswa') fetchSiswaFromScript();
+        if (dataName === 'Guru' || dataName === 'Kelas') fetchKelasAndGuru();
+      }
+    }
+
+   // Variable penanda apakah data sedang dalam mode Edit atau Tambah Baru
+
+
+// -------------------------------------------------------------------------
+// 1. FUNGSI UNTUK CEK DATA EXISTING SAAT SISWA / TANGGAL BERUBAH
+// -------------------------------------------------------------------------
+async function checkExistingMutabaah() {
+  const tanggal = document.getElementById('input-tanggal').value;
+  const siswa = document.getElementById('input-siswa').value;
+
+  // Cek hanya jika kedua field sudah diisi
+  if (!tanggal || !siswa) return;
+
+  const payload = {
+    action: "getMutabaah",
+    tanggal: tanggal,
+    siswa: siswa
+  };
+
+  try {
+    const res = await sendToSpreadsheet(payload);
+
+    if (res && res.result === "success" && res.found) {
+      isEditMode = true;
+      const data = res.data;
+
+      // Autofill nilai ke form
+      document.getElementById('ziyadah-dari-input').value = data.ziyadahDari || '';
+      document.getElementById('ziyadah-sampai-input').value = data.ziyadahSampai || '';
+      document.getElementById('ziyadah-nilai-angka').value = data.ziyadahNilai || '';
+      
+      document.getElementById('murajaah-dari-input').value = data.murajaahDari || '';
+      document.getElementById('murajaah-sampai-input').value = data.murajaahSampai || '';
+      document.getElementById('murajaah-nilai').value = data.murajaahNilai || '';
+      
+      document.getElementById('tahsin-dari-input').value = data.tahsinDari || '';
+      document.getElementById('tahsin-sampai-input').value = data.tahsinSampai || '';
+      document.getElementById('tahsin-nilai-angka').value = data.tahsinNilai || '';
+      
+      document.getElementById('adab-nilai-dropdown').value = data.adabNilai || '';
+      document.getElementById('adab-catatan').value = data.adabCatatan || '';
+      document.getElementById('catatan-guru-tambahan').value = data.catatanTambahan || '';
+
+      // Checkbox Tajwid
+      const tajwidArr = data.tajwid ? data.tajwid.split(', ') : [];
+      document.querySelectorAll('.chk-tajwid').forEach(cb => {
+        cb.checked = tajwidArr.includes(cb.value);
+      });
+      if (typeof updateMultiSelect === 'function') updateMultiSelect('tajwid');
+
+      // Checkbox Pelafalan
+      const pelafalanArr = data.pelafalan ? data.pelafalan.split(', ') : [];
+      document.querySelectorAll('.chk-pelafalan').forEach(cb => {
+        cb.checked = pelafalanArr.includes(cb.value);
+      });
+      if (typeof updateMultiSelect === 'function') updateMultiSelect('pelafalan');
+
+      // Tag Kelancaran
+      if (data.kelancaran && data.kelancaran !== '-') {
+        selectedKelancaranList = data.kelancaran.split(', ');
+      } else {
+        selectedKelancaranList = [];
+      }
+      if (typeof renderKelancaranTags === 'function') renderKelancaranTags();
+
+      // Notifikasi Visual Mode Edit
+      const alertBox = document.getElementById('autofill-alert');
+      if (alertBox) {
+        alertBox.textContent = "Data tanggal ini sudah ada. Mode: EDIT DATA";
+        alertBox.classList.remove('hidden');
+      }
+
+    } else {
+      // Jika data tidak ditemukan -> Reset ke Mode Tambah Baru
+      isEditMode = false;
+      resetMutabaahFieldsOnly();
+      const alertBox = document.getElementById('autofill-alert');
+      if (alertBox) alertBox.classList.add('hidden');
+    }
+  } catch (err) {
+    console.error("Gagal memeriksa data mutabaah:", err);
+  }
+}
+
+// -------------------------------------------------------------------------
+// 2. FUNGSI SUBMIT (AUTOMATIC ADD / UPDATE)
+// -------------------------------------------------------------------------
+async function submitMutabaah(e) {
+  e.preventDefault();
+
+  // Ambil nilai tercentang Tajwid
+  const selectedTajwid = Array.from(document.querySelectorAll('.chk-tajwid:checked'))
+    .map(cb => cb.value).join(', ') || '-';
+
+  // Ambil nilai tercentang Pelafalan
+  const selectedPelafalan = Array.from(document.querySelectorAll('.chk-pelafalan:checked'))
+    .map(cb => cb.value).join(', ') || '-';
+
+  // Olah data Kelancaran
+  let kelancaranFinal = [...selectedKelancaranList];
+  const rawInput = document.getElementById('catatan-kelancaran-input')?.value.trim();
+  if (rawInput && !kelancaranFinal.includes(rawInput)) {
+    kelancaranFinal.push(rawInput);
+  }
+  const selectedKelancaran = kelancaranFinal.length > 0 ? kelancaranFinal.join(', ') : '-';
+
+  // Tentukan action berdasarkan status isEditMode
+  const payload = {
+    action: isEditMode ? "updateMutabaah" : "addMutabaah",
+    tanggal: document.getElementById('input-tanggal').value,
+    siswa: document.getElementById('input-siswa').value,
+    kelas: document.getElementById('input-kelas-display').value,
+    ziyadahDari: document.getElementById('ziyadah-dari-input').value,
+    ziyadahSampai: document.getElementById('ziyadah-sampai-input').value,
+    ziyadahNilai: document.getElementById('ziyadah-nilai-angka').value,
+    murajaahDari: document.getElementById('murajaah-dari-input').value,
+    murajaahSampai: document.getElementById('murajaah-sampai-input').value,
+    murajaahNilai: document.getElementById('murajaah-nilai').value,
+    tahsinDari: document.getElementById('tahsin-dari-input').value,
+    tahsinSampai: document.getElementById('tahsin-sampai-input').value,
+    tahsinNilai: document.getElementById('tahsin-nilai-angka').value,
+    adabNilai: document.getElementById('adab-nilai-dropdown').value,
+    adabCatatan: document.getElementById('adab-catatan').value,
+    tajwid: selectedTajwid,
+    pelafalan: selectedPelafalan,
+    kelancaran: selectedKelancaran,
+    catatanTambahan: document.getElementById('catatan-guru-tambahan').value
+  };
+
+  const res = await sendToSpreadsheet(payload);
+  if (res && res.result === "success") {
+    const statusText = isEditMode ? "diperbarui" : "tersimpan";
+    alert(`Data Mutabaah Harian berhasil ${statusText} di Google Sheets!`);
+    
+    // Reset Form
+    document.getElementById('form-mutabaah').reset();
+    isEditMode = false;
+    
+    document.querySelectorAll('.chk-tajwid, .chk-pelafalan').forEach(cb => cb.checked = false);
+    if (typeof updateMultiSelect === 'function') {
+      updateMultiSelect('tajwid');
+      updateMultiSelect('pelafalan');
+    }
+
+    selectedKelancaranList = [];
+    if (typeof renderKelancaranTags === 'function') renderKelancaranTags();
+
+    document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
+    
+    const alertBox = document.getElementById('autofill-alert');
+    if (alertBox) alertBox.classList.add('hidden');
+    
+    if (typeof updateSiswaKelas === 'function') updateSiswaKelas();
+  } else {
+    alert("Gagal menyimpan data: " + (res?.message || "Terjadi kesalahan server."));
+  }
+}
+
+// Helper untuk membersihkan isi input nilai tanpa mereset Tanggal/Siswa
+function resetMutabaahFieldsOnly() {
+  const fields = [
+    'ziyadah-dari-input', 'ziyadah-sampai-input', 'ziyadah-nilai-angka',
+    'murajaah-dari-input', 'murajaah-sampai-input', 'murajaah-nilai',
+    'tahsin-dari-input', 'tahsin-sampai-input', 'tahsin-nilai-angka',
+    'adab-nilai-dropdown', 'adab-catatan', 'catatan-guru-tambahan'
+  ];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.querySelectorAll('.chk-tajwid, .chk-pelafalan').forEach(cb => cb.checked = false);
+  selectedKelancaranList = [];
+  if (typeof renderKelancaranTags === 'function') renderKelancaranTags();
+}
+
+    function handleQuranFilter(inputEl, dropdownId) {
+      const query = inputEl.value.toLowerCase().trim();
+      const dropdown = document.getElementById(dropdownId);
+      if (!query) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; return; }
+      const filtered = fullQuranOptions.filter(item => item.toLowerCase().includes(query)).slice(0, 30);
+      if (filtered.length === 0) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; return; }
+      dropdown.innerHTML = '';
+      filtered.forEach(itemText => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'autocomplete-item';
+        itemDiv.textContent = itemText;
+        itemDiv.onclick = function() {
+          inputEl.value = itemText;
+          dropdown.classList.add('hidden');
+          generateWaText();
+        };
+        dropdown.appendChild(itemDiv);
+      });
+      dropdown.classList.remove('hidden');
+    }
+
+    function handleCombinedFilter(inputEl, dropdownId) {
+      const query = inputEl.value.toLowerCase().trim();
+      const dropdown = document.getElementById(dropdownId);
+      if (!query) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; return; }
+      const filtered = combinedTahsinIqroOptions.filter(item => item.toLowerCase().includes(query)).slice(0, 30);
+      if (filtered.length === 0) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; return; }
+      dropdown.innerHTML = '';
+      filtered.forEach(itemText => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'autocomplete-item';
+        itemDiv.textContent = itemText;
+        itemDiv.onclick = function() {
+          inputEl.value = itemText;
+          dropdown.classList.add('hidden');
+          generateWaText();
+        };
+        dropdown.appendChild(itemDiv);
+      });
+      dropdown.classList.remove('hidden');
+    }
+
+    function updateSiswaKelas() {
+      const selectSiswa = document.getElementById('input-siswa');
+      const selectedOption = selectSiswa ? selectSiswa.options[selectSiswa.selectedIndex] : null;
+      const kelas = selectedOption ? selectedOption.getAttribute('data-kelas') || '' : '';
+      const displayEl = document.getElementById('input-kelas-display');
+      if (displayEl) displayEl.value = kelas;
+    }
+
+  // Variable global untuk menyimpan data laporan harian yang ditarik dari Apps Script
+let currentLaporanHarian = null;
+
+// Variabel global untuk menyimpan cache laporan harian dari sheet mutabaah
+let dataLaporanMutabaah = null;
+
+async function muatDataLaporanHarian() {
+  const tanggalLaporan = document.getElementById('wa-tanggal-laporan')?.value;
+  const namaSiswa = document.getElementById('wa-siswa')?.value;
+
+  if (!namaSiswa) {
+    alert("Silakan pilih siswa terlebih dahulu.");
+    return;
+  }
+  if (!tanggalLaporan) {
+    alert("Silakan pilih Tanggal Laporan Harian.");
+    return;
+  }
+
+  const previewEl = document.getElementById('wa-preview');
+  if (previewEl) {
+    previewEl.innerText = "⏳ Memuat data laporan harian dari sheet Mutabaah...";
+  }
+
+  try {
+    // Ambil data mutabaah berdasarkan siswa dan tanggal
+    const url = `${SCRIPT_URL}?action=getMutabaahData&nama=${encodeURIComponent(namaSiswa)}&tanggal=${encodeURIComponent(tanggalLaporan)}`;
+    const response = await fetch(url);
+    const json = await response.json();
+
+    if (json.result === "success" && json.data) {
+      dataLaporanMutabaah = json.data;
+      // Memuat data ke format teks WA secara langsung
+      generateWaText();
+    } else {
+      dataLaporanMutabaah = null;
+      if (previewEl) {
+        previewEl.innerText = `⚠️ Tidak ada data mutabaah harian untuk ${namaSiswa} pada tanggal ${tanggalLaporan}.`;
+      }
+    }
+  } catch (err) {
+    console.error("Gagal mengambil laporan mutabaah:", err);
+    dataLaporanMutabaah = null;
+    if (previewEl) {
+      previewEl.innerText = "❌ Terjadi kesalahan saat mengambil data dari Google Sheets.";
+    }
+  }
+}
+
+// Fungsi pembantu untuk mengubah format YYYY-MM-DD menjadi "Hari, DD MMMM YYYY"
+function formatHariTanggal(dateString) {
+  if (!dateString) return null;
+  
+  // Mengatasi offset timezone dengan menambahkan jam netral
+  const dateObj = new Date(dateString + 'T00:00:00');
+  if (isNaN(dateObj)) return null;
+
+  const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+  return dateObj.toLocaleDateString('id-ID', options);
+}
+
+function generateWaText() {
+  const previewEl = document.getElementById('wa-preview');
+  if (!previewEl) return;
+
+  const namaSiswaSelect = document.getElementById('wa-siswa');
+  const namaSiswa = namaSiswaSelect ? namaSiswaSelect.value : "";
+  const tanggalTargetRaw = document.getElementById('wa-tanggal-target')?.value || "";
+  const tanggalLaporanRaw = document.getElementById('wa-tanggal-laporan')?.value || "";
+
+  if (!namaSiswa) {
+    previewEl.innerText = "Silakan pilih nama ananda siswa terlebih dahulu.";
+    return;
+  }
+
+  // Format Nama Hari & Tanggal (Fallback ke string mentah atau default jika kosong)
+  const formatLaporan = formatHariTanggal(tanggalLaporanRaw) || tanggalLaporanRaw || 'Hari Ini';
+  const formatTarget = formatHariTanggal(tanggalTargetRaw) || tanggalTargetRaw || '-';
+
+  // Header Salam & Pembuka Pembelajaran
+  let textWA = `Assalamu'alaikum Warahmatullahi Wabarakatuh.\n\n`;
+  textWA += `Yth. Abu/Ummu *${namaSiswa}*,\n`;
+  textWA += `Semoga Abu dan Ummu senantiasa berada dalam keadaan sehat wal'afiat serta dalam lindungan Allah Subhanahu wa Ta'ala.\n\n`;
+  textWA += `Berikut kami sampaikan laporan mutabaah tahfizh harian ananda beserta rencana target setoran untuk pembelajaran selanjutnya:\n\n`;
+
+  // ==========================================
+  // BAGIAN 1: LAPORAN HARIAN (HASIL TARIK SHEET)
+  // ==========================================
+  textWA += `📋 *LAPORAN MUTABAAH HARIAN*\n`;
+  textWA += `Hari/Tanggal: ${formatLaporan}\n`;
+  textWA += `---------------------------------------------\n`;
+
+  if (typeof dataLaporanMutabaah !== 'undefined' && dataLaporanMutabaah) {
+    const d = dataLaporanMutabaah;
+
+    textWA += `📖 *1. Setoran Ziyadah (Hafalan Baru)*\n`;
+    textWA += `   • Capaian : ${d.ziyadah_dari || '-'} s/d ${d.ziyadah_sampai || '-'}\n`;
+    textWA += `   • Nilai   : ${d.ziyadah_nilai || '-'}\n\n`;
+
+    textWA += `🔄 *2. Setoran Muraja'ah*\n`;
+    textWA += `   • Capaian : ${d.murajaah_dari || '-'} s/d ${d.murajaah_sampai || '-'}\n`;
+    textWA += `   • Nilai   : ${d.murajaah_nilai || '-'}\n\n`;
+
+    textWA += `📚 *3. Setoran Tahsin / Iqro*\n`;
+    textWA += `   • Capaian : ${d.tahsin_dari || '-'} s/d ${d.tahsin_sampai || '-'}\n`;
+    textWA += `   • Nilai   : ${d.tahsin_nilai || '-'}\n\n`;
+
+    textWA += `🌟 *4. Penilaian Adab & Kedisiplinan*\n`;
+    textWA += `   • Predikat : ${d.adab_nilai || '-'}\n`;
+    if (d.adab_catatan && d.adab_catatan !== "-") {
+      textWA += `   • Catatan  : ${d.adab_catatan}\n`;
+    }
+    textWA += `\n`;
+
+    if (d.catatan_tajwid || d.catatan_pelafalan || d.catatan_kelancaran || d.catatan_guru) {
+      textWA += `📝 *Catatan & Evaluasi Pembelajaran:*\n`;
+      if (d.catatan_tajwid) textWA += `   • Tajwid: ${d.catatan_tajwid}\n`;
+      if (d.catatan_pelafalan) textWA += `   • Pelafalan: ${d.catatan_pelafalan}\n`;
+      if (d.catatan_kelancaran) textWA += `   • Kelancaran: ${d.catatan_kelancaran}\n`;
+      if (d.catatan_guru) textWA += `   • Catatan Pengampu: ${d.catatan_guru}\n`;
+      textWA += `\n`;
+    }
+  } else {
+    textWA += `_(Data laporan harian belum dimuat atau tidak ditemukan)_\n\n`;
+  }
+
+  // ==========================================
+  // BAGIAN 2: RENCANA TARGET SETORAN (BESOK)
+  // ==========================================
+  const ziyadahDari = document.getElementById('wa-ziyadah-dari')?.value || "-";
+  const ziyadahSampai = document.getElementById('wa-ziyadah-sampai')?.value || "-";
+  const tahsinDari = document.getElementById('wa-tahsin-dari')?.value || "-";
+  const tahsinSampai = document.getElementById('wa-tahsin-sampai')?.value || "-";
+  const murajaahDari = document.getElementById('wa-murajaah-dari')?.value || "-";
+  const murajaahSampai = document.getElementById('wa-murajaah-sampai')?.value || "-";
+  const catatanTarget = document.getElementById('wa-catatan')?.value || "";
+
+  textWA += `🎯 *RENCANA TARGET SETORAN BESOK*\n`;
+  textWA += `Hari/Tanggal Target: ${formatTarget}\n`;
+  textWA += `---------------------------------------------\n`;
+  textWA += `📌 *1. Target Ziyadah:* ${ziyadahDari} s/d ${ziyadahSampai}\n`;
+  textWA += `📌 *2. Target Tahsin:* ${tahsinDari} s/d ${tahsinSampai}\n`;
+  textWA += `📌 *3. Target Muraja'ah:* ${murajaahDari} s/d ${murajaahSampai}\n`;
+
+  if (catatanTarget.trim() !== "") {
+    textWA += `\n📝 *Pesan Pembimbing:* ${catatanTarget}\n`;
+  }
+
+  // Penutup Formil & Doa
+  textWA += `\nMohon perkenan Abu dan Ummu untuk mendampingi serta mengarahkan ananda di rumah agar target pembelajaran dapat tercapai dengan optimal.\n\n`;
+  textWA += `Atas perhatian, kerja sama, dan bimbingan yang Abu dan Ummu berikan, kami ucapkan *Jazakumullahu khairan wa barakallahu feekum*.\n\n`;
+  textWA += `Wassalamu'alaikum Warahmatullahi Wabarakatuh.\n\n`;
+  textWA += `_Hormat kami,_\n`;
+  textWA += `*Tim Pembimbing Tahfizh*`;
+
+  previewEl.innerText = textWA;
+}
+/**
+ * 3. Pembaruan Fungsi Load Target saat Siswa Dipilih
+ */
+async function loadTargetWABySiswa() {
+  const siswaSelect = document.getElementById('wa-siswa');
+  const siswa = siswaSelect.value;
+  
+  // 1. Ambil elemen option yang sedang dipilih
+  const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
+  
+  // 2. Tarik nilai atribut data-wa
+  const defaultWa = selectedOption ? selectedOption.getAttribute('data-wa') : '';
+
+  // 3. Masukkan nomor WA secara otomatis ke input form
+  document.getElementById('wa-nomor').value = defaultWa || '';
+
+  if (!siswa) {
+    clearFormTargetWA();
+    generateWaText();
+    return;
+  }
+
+  // Tarik data target lainnya dari Google Sheets (jika sudah pernah ada tersimpan)
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getTargetWA&siswa=${encodeURIComponent(siswa)}`);
+    const json = await res.json();
+
+    if (json.result === "success" && json.data) {
+      const d = json.data;
+      // Gunakan WA dari sheet database target, atau gunakan defaultWA dari Master Siswa
+      document.getElementById('wa-nomor').value = d.wa || defaultWa || '';
+      document.getElementById('wa-tanggal-target').value = d.tanggal || '';
+      document.getElementById('wa-ziyadah-dari').value = d.ziyadahDari || '';
+      document.getElementById('wa-ziyadah-sampai').value = d.ziyadahSampai || '';
+      document.getElementById('wa-tahsin-dari').value = d.tahsinDari || '';
+      document.getElementById('wa-tahsin-sampai').value = d.tahsinSampai || '';
+      document.getElementById('wa-murajaah-dari').value = d.murajaahDari || '';
+      document.getElementById('wa-murajaah-sampai').value = d.murajaahSampai || '';
+      document.getElementById('wa-catatan').value = d.catatan || '';
+    }
+    generateWaText();
+  } catch (err) {
+    console.error("Gagal memuat target WA:", err);
+  }
+}
+
+    function sendWhatsApp() {
+      const phone = document.getElementById('wa-nomor').value;
+      if (!phone) {
+        alert("Nomor WA Orang Tua belum terisi!");
+        return;
+      }
+      const text = encodeURIComponent(document.getElementById('wa-preview').innerText);
+      window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById('pdf-content');
+      const opt = {
+        margin:       0.5,
+        filename:     'Laporan_Mutabaah_Tahfizh_Tahsin.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+ async function loadReportData() {
+  const siswaSelect = document.getElementById('report-filter-siswa');
+  const siswa = siswaSelect ? siswaSelect.value.trim() : '';
+  const bulanInput = document.getElementById('report-filter-bulan');
+  const bulan = bulanInput ? bulanInput.value : ''; // Format YYYY-MM
+
+  if (!siswa) {
+    alert("Silakan pilih siswa terlebih dahulu.");
+    return;
+  }
+
+  // Tampilkan indikator loading (diperbarui ke colspan="4")
+  const tbodyTahfizh = document.getElementById('tbody-tahfizh');
+  const tbodyTahsin = document.getElementById('tbody-tahsin');
+  const loadingRow = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Memuat data laporan...</td></tr>';
+  if (tbodyTahfizh) tbodyTahfizh.innerHTML = loadingRow;
+  if (tbodyTahsin) tbodyTahsin.innerHTML = loadingRow;
+
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=getReport&siswa=${encodeURIComponent(siswa)}&bulan=${encodeURIComponent(bulan)}`);
+    const json = await response.json();
+
+    // 1. Update Header Info Siswa & Pembimbing
+    const selectedOption = siswaSelect ? siswaSelect.options[siswaSelect.selectedIndex] : null;
+    const kelas = selectedOption ? (selectedOption.getAttribute('data-kelas') || selectedOption.dataset.kelas || '-') : '-';
+    const nisValue = selectedOption ? (selectedOption.getAttribute('data-nis') || selectedOption.dataset.nis) : null;
+    const nisFinal = (nisValue && nisValue.trim() !== '') ? nisValue : (json.nis || json.nisn || '-');
+
+    const elNama = document.getElementById('report-siswa-nama');
+    const elKelas = document.getElementById('report-siswa-kelas');
+    const elNis = document.getElementById('report-siswa-nis');
+
+    if (elNama) elNama.innerText = siswa;
+    if (elKelas) elKelas.innerText = kelas;
+    if (elNis) elNis.innerText = nisFinal;
+
+    if (typeof currentUser !== 'undefined' && currentUser) {
+      const namaGuru = currentUser.username || 'Ustaz Pembimbing';
+      const elGuru = document.getElementById('report-guru-nama');
+      const elTTD = document.getElementById('report-ttd-guru');
+      if (elGuru) elGuru.innerText = namaGuru;
+      if (elTTD) elTTD.innerText = namaGuru;
+    }
+
+    if (typeof updateReportManualInputs === 'function') {
+      updateReportManualInputs();
+    }
+
+    // 2. Render Data ke Format Tabel Terpisah
+    if (json.result === "success" && json.data) {
+      const dataBulan = Array.isArray(json.data) ? json.data[0] : json.data;
+      renderSingleMonthReport(dataBulan, bulan);
+    } else {
+      renderEmptySingleMonthTables();
+    }
+  } catch (err) {
+    console.error("Gagal memuat laporan:", err);
+    renderEmptySingleMonthTables("Gagal mengambil data laporan. Terjadi kesalahan jaringan/script.");
+  }
+}
+
+// Helper untuk mengonversi nilai angka rata-rata ke Predikat
+function getPredikat(nilai) {
+  if (nilai === null || nilai === undefined || nilai === '' || nilai === '-') return '-';
+  const num = parseFloat(nilai);
+  if (isNaN(num)) return nilai; // Jika data sudah berupa huruf (seperti A/B)
+
+  if (num >= 90) return 'Mumtaz';
+  if (num >= 80) return 'Jayyid Jiddan';
+  if (num >= 70) return 'Jayyid';
+  if (num >= 60) return 'Maqbul';
+  return 'Rasib';
+}
+
+function renderSingleMonthReport(item, inputBulan) {
+  const setElementText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = (val !== undefined && val !== null && val !== '') ? val : '-';
+  };
+
+  // 1. ASPEK TAHFIZH (Awal, Akhir, Nilai)
+  const tbodyTahfizh = document.getElementById('tbody-tahfizh');
+  if (tbodyTahfizh) {
+    tbodyTahfizh.innerHTML = `
+      <tr class="border-b border-slate-300">
+        <td class="p-2 text-center border border-slate-300">1</td>
+        <td class="p-2 border border-slate-300">${item?.ziyadahDari || '-'}</td>
+        <td class="p-2 border border-slate-300">${item?.ziyadahSampai || '-'}</td>
+        <td class="p-2 text-center border border-slate-300 font-bold">${item?.ziyadahNilai || '-'}</td>
+      </tr>
+    `;
+  }
+
+  // 2. ASPEK TAHSIN / IQRA (Awal, Akhir, Nilai)
+  const tbodyTahsin = document.getElementById('tbody-tahsin');
+  if (tbodyTahsin) {
+    tbodyTahsin.innerHTML = `
+      <tr class="border-b border-slate-300">
+        <td class="p-2 text-center border border-slate-300">1</td>
+        <td class="p-2 border border-slate-300">${item?.tahsinDari || '-'}</td>
+        <td class="p-2 border border-slate-300">${item?.tahsinSampai || '-'}</td>
+        <td class="p-2 text-center border border-slate-300 font-bold">${item?.tahsinNilai || '-'}</td>
+      </tr>
+    `;
+  }
+
+  // 3. PENILAIAN MURAJA'AH & ADAB (Ambil Nilai Rata-rata dari Bulan Terpilih)
+  const adabAvg = item?.adabRataRata || item?.adabMutu || '-';
+  const murajaahAvg = item?.murajaahRataRata || item?.murajaahMutu || '-';
+  const tajwidAvg = item?.tajwidRataRata || item?.tajwidMutu || '-';
+  const pelafalanAvg = item?.pelafalanRataRata || item?.pelafalanMutu || '-';
+
+  setElementText('adab-mutu', adabAvg);
+  setElementText('adab-predikat', item?.adabPredikat || getPredikat(adabAvg));
+
+  setElementText('murajaah-mutu', murajaahAvg);
+  setElementText('murajaah-predikat', item?.murajaahPredikat || getPredikat(murajaahAvg));
+
+  setElementText('tajwid-mutu', tajwidAvg);
+  setElementText('tajwid-predikat', item?.tajwidPredikat || getPredikat(tajwidAvg));
+
+  setElementText('pelafalan-mutu', pelafalanAvg);
+  setElementText('pelafalan-predikat', item?.pelafalanPredikat || getPredikat(pelafalanAvg));
+
+  // Ringkasan Target Capaian
+  setElementText('target-capaian', item?.targetCapaian);
+  setElementText('pencapaian-siswa', item?.pencapaian);
+  setElementText('keterangan-capaian', item?.keterangan || 'Tuntas');
+
+  // Catatan Pembimbing
+  const inputEvaluasi = document.getElementById('report-input-evaluasi');
+  const elCatatan = document.getElementById('report-catatan');
+  if (elCatatan && (!inputEvaluasi || inputEvaluasi.value.trim() === '')) {
+    elCatatan.innerText = item?.catatanTambahan || "Terus tingkatkan semangat muroja'ah di rumah.";
+  }
+}
+
+function renderEmptySingleMonthTables(pesan) {
+  const msg = pesan || "Tidak ada data setoran untuk periode ini.";
+  const emptyRow = `<tr><td colspan="4" class="p-4 text-center text-slate-400">${msg}</td></tr>`;
+  
+  const tbodyTahfizh = document.getElementById('tbody-tahfizh');
+  const tbodyTahsin = document.getElementById('tbody-tahsin');
+  if (tbodyTahfizh) tbodyTahfizh.innerHTML = emptyRow;
+  if (tbodyTahsin) tbodyTahsin.innerHTML = emptyRow;
+}
+
+async function fetchDashboardStats() {
+  try {
+    let url = `${SCRIPT_URL}?action=getSiswa`;
+    
+    // Sesuaikan parameter jika login sebagai guru agar statistik sesuai kelasnya
+    if (currentUser && currentUser.role === 'guru') {
+      url += `&role=${encodeURIComponent(currentUser.role)}&username=${encodeURIComponent(currentUser.username)}`;
+    }
+
+    const response = await fetch(url);
+    const json = await response.json();
+
+    if (json.result === "success" && json.data) {
+      // Hitung total jumlah siswa dari array data
+      const totalSiswa = json.data.length;
+      
+      // Update elemen HTML di Dashboard
+      const statTotalEl = document.getElementById('stat-total-siswa');
+      if (statTotalEl) {
+        statTotalEl.innerText = `${totalSiswa} Siswa`;
+      }
+    }
+  } catch (err) {
+    console.error("Gagal mengambil statistik dashboard:", err);
+  }
+}
+
+function getPersentaseCapaian(nilai) {
+  if (typeof nilai === 'number') return nilai;
+  
+  // Konversi jika nilai berupa Kategori Text
+  const text = String(nilai).trim().toLowerCase();
+  switch (text) {
+    case 'sudah muncul':
+    case 'mahir':
+    case 'sangat baik':
+      return 100;
+    case 'sedang berkembang':
+    case 'berkembang':
+    case 'baik':
+      return 75;
+    case 'mulai muncul':
+    case 'cukup':
+      return 50;
+    case 'belum muncul':
+    case 'perlu bimbingan':
+      return 25;
+    default:
+      const num = parseFloat(text);
+      return isNaN(num) ? 0 : num;
+  }
+}
+
+// Fungsi untuk meng-update teks evaluasi pada preview PDF secara real-time
+function updateReportEvaluasiText() {
+  const inputEvaluasi = document.getElementById('report-input-evaluasi').value;
+  const reportCatatan = document.getElementById('report-catatan');
+  
+  if (reportCatatan) {
+    if (inputEvaluasi.trim() !== "") {
+      reportCatatan.innerText = inputEvaluasi;
+    } else {
+      reportCatatan.innerText = "Terus tingkatkan semangat muroja'ah di rumah.";
+    }
+  }
+}
+
+function updateReportManualInputs() {
+  const inputSemester = document.getElementById('manual-input-semester')?.value;
+  const inputThnAjaran = document.getElementById('manual-input-thn-ajaran')?.value;
+  const inputEvaluasi = document.getElementById('report-input-evaluasi')?.value;
+
+  const elSemester = document.getElementById('report-semester');
+  const elThnAjaran = document.getElementById('report-thn-ajaran');
+  const elCatatan = document.getElementById('report-catatan');
+
+  if (elSemester) elSemester.innerText = inputSemester || '-';
+  if (elThnAjaran) elThnAjaran.innerText = inputThnAjaran || '-';
+
+  if (elCatatan) {
+    elCatatan.innerText = inputEvaluasi?.trim() !== '' 
+      ? inputEvaluasi 
+      : "Terus tingkatkan semangat muroja'ah di rumah.";
+  }
+}
+
+function updateReportSiswaInfo() {
+  const siswaSelect = document.getElementById('report-filter-siswa');
+  const selectedOption = siswaSelect?.options[siswaSelect.selectedIndex];
+
+  const elNama = document.getElementById('report-siswa-nama');
+  const elNis = document.getElementById('report-siswa-nis');
+  const elKelas = document.getElementById('report-siswa-kelas');
+
+  if (selectedOption && selectedOption.value) {
+    if (elNama) elNama.innerText = selectedOption.value;
+    if (elNis) elNis.innerText = selectedOption.getAttribute('data-nis') || '-';
+    if (elKelas) elKelas.innerText = selectedOption.getAttribute('data-kelas') || '-';
+  } else {
+    if (elNama) elNama.innerText = '-';
+    if (elNis) elNis.innerText = '-';
+    if (elKelas) elKelas.innerText = '-';
+  }
+}
+
+// Array penampung tag kelancaran yang terpilih
+let selectedKelancaranList = [];
+
+// Fungsi filter nama surat/ayat untuk input Kelancaran
+function handleQuranFilterMulti(inputEl) {
+  const query = inputEl.value.trim().toLowerCase();
+  const dropdown = document.getElementById('kelancaran-dropdown');
+  
+  if (!query) {
+    dropdown.classList.add('hidden');
+    dropdown.innerHTML = '';
+    return;
+  }
+
+  // Mengambil dan memfilter data dari quranList (sesuaikan dengan nama variabel array surat Anda)
+  const filtered = (typeof quranList !== 'undefined' ? quranList : []).filter(item => 
+    item.toLowerCase().includes(query)
+  );
+
+  if (filtered.length === 0) {
+    dropdown.classList.add('hidden');
+    dropdown.innerHTML = '';
+    return;
+  }
+
+  // Tampilkan daftar hasil pencarian
+  dropdown.innerHTML = filtered.map(item => `
+    <div onclick="addKelancaranTag('${item.replace(/'/g, "\\'")}')" class="p-2 hover:bg-emerald-50 cursor-pointer border-b border-slate-100 last:border-none text-xs text-slate-700">
+      ${item}
+    </div>
+  `).join('');
+
+  dropdown.classList.remove('hidden');
+}
+
+// Fungsi memasukkan surat dari dropdown ke dalam daftar tag
+function addKelancaranTag(value) {
+  if (value && !selectedKelancaranList.includes(value)) {
+    selectedKelancaranList.push(value);
+    renderKelancaranTags();
+  }
+  
+  const inputEl = document.getElementById('catatan-kelancaran-input');
+  if (inputEl) inputEl.value = '';
+  
+  const dropdown = document.getElementById('kelancaran-dropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+  
+  inputEl?.focus();
+}
+
+// Fungsi menghapus tag dari list
+function removeKelancaranTag(index) {
+  selectedKelancaranList.splice(index, 1);
+  renderKelancaranTags();
+}
+
+// Render tampilan tag/badge yang dipilih
+function renderKelancaranTags() {
+  const container = document.getElementById('kelancaran-tags');
+  if (!container) return;
+
+  container.innerHTML = selectedKelancaranList.map((item, index) => `
+    <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-md font-medium">
+      ${item}
+      <button type="button" onclick="removeKelancaranTag(${index})" class="hover:text-red-600 focus:outline-none ml-0.5">
+        &times;
+      </button>
+    </span>
+  `).join('');
+}
+
+let isEditMode = false; // Penanda mode simpan/update
+
+// Tangkap elemen Tanggal dan Dropdown Siswa (Sesuaikan ID-nya dengan HTML Anda)
+const inputTanggal = document.getElementById('input-tanggal');
+const inputSiswa = document.getElementById('input-siswa');
+
+// Pasang trigger otomatis saat Tanggal atau Siswa berubah
+inputTanggal.addEventListener('change', cekDataOtomatis);
+inputSiswa.addEventListener('change', cekDataOtomatis);
+
+async function cekDataOtomatis() {
+  const tgl = inputTanggal.value;
+  const siswa = inputSiswa.value;
+
+  // Jalankan pencarian HANYA jika Tanggal dan Nama Siswa sudah terpilih
+  if (!tgl || !siswa) return;
+
+  try {
+    const payload = {
+      action: "getMutabaah",
+      tanggal: tgl,
+      siswa: siswa
+    };
+
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+
+    const res = await response.json();
+
+    if (res.result === "success" && res.found) {
+      // DATA DITEMUKAN -> MASUK MODE EDIT & ISI FORM
+      isEditMode = true;
+      const d = res.data;
+
+      document.getElementById('ziyadah-dari').value = d.ziyadahDari || '';
+      document.getElementById('ziyadah-sampai').value = d.ziyadahSampai || '';
+      document.getElementById('ziyadah-nilai').value = d.ziyadahNilai || '';
+      
+      document.getElementById('murajaah-dari').value = d.murajaahDari || '';
+      document.getElementById('murajaah-sampai').value = d.murajaahSampai || '';
+      document.getElementById('murajaah-nilai').value = d.murajaahNilai || '';
+      
+      document.getElementById('tahsin-dari').value = d.tahsinDari || '';
+      document.getElementById('tahsin-sampai').value = d.tahsinSampai || '';
+      document.getElementById('tahsin-nilai').value = d.tahsinNilai || '';
+
+      document.getElementById('adab-nilai').value = d.adabNilai || '';
+      document.getElementById('adab-catatan').value = d.adabCatatan || '';
+      
+      document.getElementById('tajwid').value = d.tajwid || '';
+      document.getElementById('pelafalan').value = d.pelafalan || '';
+      document.getElementById('kelancaran').value = d.kelancaran || '';
+      document.getElementById('catatan-tambahan').value = d.catatanTambahan || '';
+
+      alert(`Data setoran ${siswa} pada tanggal ${tgl} ditemukan! Form otomatis diisi untuk diperbarui.`);
+    } else {
+      // DATA TIDAK DITEMUKAN -> MODE INPUT BARU & KOSONGKAN FORM
+      isEditMode = false;
+      resetFieldMutabaah();
+    }
+  } catch (err) {
+    console.error("Gagal memeriksa data:", err);
+  }
+}
+
+
+  </script>
+</body>
+</html>
