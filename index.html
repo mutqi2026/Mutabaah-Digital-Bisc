@@ -663,8 +663,8 @@
           </button>
         </div>
 
-        <!-- Mode Alat Canvas -->
-<div class="flex items-center gap-1 border-l border-r px-2 border-slate-300">
+    <!-- Mode Alat Canvas -->
+<div class="flex items-center gap-1.5 border-l border-r px-2 border-slate-300">
   <!-- Mode Kursor Default (Navigasi / Scroll) -->
   <button type="button" id="tool-cursor" onclick="setCanvasTool('cursor')" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors" title="Mode Kursor (Navigasi/Scroll)">
     <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i>
@@ -685,11 +685,26 @@
     <i data-lucide="eraser" class="w-3.5 h-3.5"></i>
   </button>
 
-  <!-- Color Picker -->
-  <input type="color" id="pen-color" value="#dc2626" class="w-6 h-6 rounded cursor-pointer border border-slate-300 p-0.5 bg-white" title="Pilih Warna">
+  <!-- Color Picker + Opacity Slider Group -->
+  <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200" title="Pengaturan Warna & Transparansi">
+    <input type="color" id="pen-color" value="#dc2626" class="w-6 h-6 rounded cursor-pointer border border-slate-300 p-0 bg-transparent" title="Pilih Warna">
+    
+<!-- Slider Opacity (0% - 100%) -->
+<div class="flex items-center gap-1 px-1">
+  <input type="range" 
+         id="pen-opacity" 
+         min="0" 
+         max="100" 
+         value="40" 
+         step="5" 
+         class="w-12 h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-600" 
+         title="Transparansi Warna">
+  <span id="opacity-label" class="text-[10px] font-semibold text-slate-600 w-6 text-right select-none">40%</span>
+</div>
+  </div>
 
   <!-- Tombol Undo -->
-  <button type="button" onclick="undoQuranCanvas()" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors ml-1" title="Batalkan Coretan Terakhir (Undo)">
+  <button type="button" onclick="undoQuranCanvas()" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors ml-0.5" title="Batalkan Coretan Terakhir (Undo)">
     <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
   </button>
 
@@ -698,12 +713,12 @@
           id="drag-handle" 
           onclick="downloadQuranWithAnnotations()" 
           title="Klik untuk Unduh, Tahan untuk Geser"
-          class="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-grab active:cursor-grabbing transition-all flex items-center justify-center ml-1">
+          class="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-grab active:cursor-grabbing transition-all flex items-center justify-center ml-0.5">
     <svg id="download-icon" class="w-4 h-4 origin-center transition-transform duration-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
     </svg>
   </button>
-</div>      
+</div>
 
         <!-- Tombol Bersihkan -->
         <button type="button" onclick="clearQuranCanvas()" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1" title="Hapus Semua Coretan">
@@ -2429,9 +2444,11 @@ const JUZ_PAGE_MAP = {
 };
 
 let currentQuranPage = 1;
-let currentTool = 'pen'; // 'pen', 'text', 'eraser'
+let currentTool = 'cursor'; // Default mode kursor
 let isDrawing = false;
 let canvas, ctx, quranImg;
+let canvasHistory = [];
+const MAX_HISTORY_STEPS = 20;
 
 // ==========================================
 // INITIALIZATION
@@ -2445,10 +2462,38 @@ document.addEventListener('DOMContentLoaded', () => {
     initQuranCanvas();
     loadQuranPage(1);
   }, 300);
+
+  // Listener untuk update Teks Label Persentase Opacity
+  const opacityInput = document.getElementById("pen-opacity");
+  const opacityLabel = document.getElementById("opacity-label");
+  if (opacityInput && opacityLabel) {
+    opacityInput.addEventListener("input", (e) => {
+      opacityLabel.textContent = `${e.target.value}%`;
+    });
+  }
 });
 
 // Sync ukuran Canvas saat jendela di-resize
 window.addEventListener('resize', syncCanvasSize);
+
+// ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+// Konversi Warna HEX + Slider Opacity ke Format RGBA
+function getRgbaColor() {
+  const colorInput = document.getElementById('pen-color');
+  const opacityInput = document.getElementById('pen-opacity');
+  
+  const hex = colorInput ? colorInput.value : '#dc2626';
+  const opacityVal = opacityInput ? opacityInput.value : 100;
+  const alpha = opacityVal / 100;
+
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 // ==========================================
 // API DROPDOWN (SURAH & JUZ)
@@ -2496,7 +2541,6 @@ function loadQuranPage(pageNum) {
 
   currentQuranPage = page;
 
-  // Sinkronkan input ID jika ada (mendukung kedua variasi ID)
   const pageInput = document.getElementById('quran-page-num') || document.getElementById('mushaf-page-input');
   const loadingElement = document.getElementById('quran-loading');
   quranImg = document.getElementById('quran-page-img');
@@ -2559,20 +2603,18 @@ function jumpToJuz(juzNumber) {
 // Event handler saat gambar sukses dimuat
 function handleImageLoaded() {
   const img = document.getElementById('quran-page-img');
-  const canvas = document.getElementById('quran-drawing-canvas');
+  const canvasElement = document.getElementById('quran-drawing-canvas');
   const loading = document.getElementById('quran-loading');
 
-  if (img && canvas) {
-    // Sembunyikan loading indicator
+  if (img && canvasElement) {
     if (loading) loading.classList.add('hidden');
 
-    // Samakan ukuran canvas dengan ukuran asli gambar yang dirender
-    canvas.width = img.clientWidth;
-    canvas.height = img.clientHeight;
+    // Samakan ukuran canvas dengan ukuran asli gambar
+    canvasElement.width = img.clientWidth;
+    canvasElement.height = img.clientHeight;
   }
 }
 
-// Jalankan ulang resize canvas saat jendela browser di-resize
 window.addEventListener('resize', handleImageLoaded);
 
 // Fallback jika gambar SVG gagal dimuat
@@ -2583,7 +2625,6 @@ function handleImageError() {
   if (quranImg && !quranImg.dataset.retried) {
     quranImg.dataset.retried = "true";
     const formattedPage = String(currentQuranPage).padStart(3, '0');
-    // Cadangan PNG CDN
     quranImg.src = `https://cdn.jsdelivr.net/gh/fawazaudi/quran-images@main/${formattedPage}.png`;
   } else {
     alert("Gagal memuat gambar Al-Qur'an. Silakan periksa koneksi internet Anda.");
@@ -2593,9 +2634,6 @@ function handleImageError() {
 // ==========================================
 // CANVAS & DRAWING LOGIC (WITH UNDO SUPPORT)
 // ==========================================
-let canvasHistory = [];
-const MAX_HISTORY_STEPS = 20;
-
 function initQuranCanvas() {
   canvas = document.getElementById('quran-drawing-canvas');
   if (!canvas) return;
@@ -2613,12 +2651,14 @@ function initQuranCanvas() {
   canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
   canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
   canvas.addEventListener('touchend', stopDrawing);
+
+  // Inisialisasi mode awal
+  setCanvasTool('cursor');
 }
 
 function syncCanvasSize() {
   if (!canvas || !quranImg) return;
   
-  // Ambil ukuran riil yang tampil di layar desktop/mobile
   const width = quranImg.offsetWidth || quranImg.clientWidth;
   const height = quranImg.offsetHeight || quranImg.clientHeight;
 
@@ -2653,10 +2693,13 @@ function undoQuranCanvas() {
 }
 
 function setCanvasTool(tool) {
-  const canvas = document.getElementById("quran-drawing-canvas");
+  currentTool = tool;
+  canvas = document.getElementById("quran-drawing-canvas");
   const tools = ['cursor', 'pen', 'text', 'eraser'];
+  const opacityInput = document.getElementById('pen-opacity');
+  const opacityLabel = document.getElementById('opacity-label');
 
-  // 1. Reset warna semua tombol ke tampilan default
+  // Reset warna semua tombol ke tampilan default
   tools.forEach(t => {
     const btn = document.getElementById(`tool-${t}`);
     if (btn) {
@@ -2664,39 +2707,54 @@ function setCanvasTool(tool) {
     }
   });
 
-  // 2. Beri warna aktif (emerald) pada tombol yang dipilih
+  // Beri warna aktif (emerald) pada tombol yang dipilih
   const activeBtn = document.getElementById(`tool-${tool}`);
   if (activeBtn) {
     activeBtn.className = "p-1.5 bg-emerald-600 text-white rounded-lg transition-colors";
   }
 
-  // 3. Atur perilaku canvas
   if (!canvas) return;
 
+  // Atur perilaku canvas & transparansi otomatis jika diperlukan
   if (tool === 'cursor') {
-    // Matikan event pada canvas agar layar/gambar di bawahnya bisa di-scroll / di-drag
-    canvas.style.pointerEvents = 'none';
+    canvas.style.pointerEvents = 'none'; // Mode Navigasi/Scroll
   } else {
-    // Aktifkan kembali interaksi menggambar
     canvas.style.pointerEvents = 'auto';
     
-    if (tool === 'pen') canvas.style.cursor = 'crosshair';
-    else if (tool === 'text') canvas.style.cursor = 'text';
-    else if (tool === 'eraser') canvas.style.cursor = 'cell';
+    if (tool === 'pen') {
+      canvas.style.cursor = 'crosshair';
+    } else if (tool === 'text') {
+      canvas.style.cursor = 'text';
+    } else if (tool === 'eraser') {
+      canvas.style.cursor = 'cell';
+    }
   }
 }
 
+// Menghitung Koordinat Presisi Terhadap Skala Canvas
 function getCanvasCoordinates(e) {
+  if (!canvas) return { x: 0, y: 0 };
+
   const rect = canvas.getBoundingClientRect();
   const clientX = e.clientX || (e.touches && e.touches[0].clientX);
   const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+  
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
   return {
-    x: clientX - rect.left,
-    y: clientY - rect.top
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
   };
 }
 
+// Simpan koordinat terakhir kursor
+let lastX = 0;
+let lastY = 0;
+
 function startDrawing(e) {
+  if (currentTool === 'cursor') return;
+
   const pos = getCanvasCoordinates(e);
 
   if (currentTool === 'text') {
@@ -2704,45 +2762,61 @@ function startDrawing(e) {
     return;
   }
 
-  // Simpan keadaan canvas sebelum jalur pena/eraser dibuat
   saveCanvasState();
-
   isDrawing = true;
-  ctx.beginPath();
-  ctx.moveTo(pos.x, pos.y);
+  
+  // Catat titik awal
+  lastX = pos.x;
+  lastY = pos.y;
 }
 
 function draw(e) {
-  if (!isDrawing) return;
+  if (!isDrawing || currentTool === 'cursor' || currentTool === 'text') return;
+  
   const pos = getCanvasCoordinates(e);
-  const colorInput = document.getElementById('pen-color');
-  const color = colorInput ? colorInput.value : '#dc2626';
+
+  // Jika kursor tidak bergeser (misal: klik lama di tempat), hentikan menggambar
+  if (pos.x === lastX && pos.y === lastY) return;
+
+  const activeColor = getRgbaColor();
+
+  ctx.beginPath(); // Reset path agar stroke tidak menggambar ulang garis lama
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(pos.x, pos.y);
 
   if (currentTool === 'pen') {
-    ctx.strokeStyle = color;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = activeColor;
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.lineTo(pos.x, pos.y);
+    ctx.lineJoin = 'round';
     ctx.stroke();
   } else if (currentTool === 'eraser') {
-    ctx.clearRect(pos.x - 12, pos.y - 12, 24, 24);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth = 24;
+    ctx.lineCap = 'round';
+    ctx.stroke();
   }
+
+  // Perbarui posisi terakhir
+  lastX = pos.x;
+  lastY = pos.y;
 }
 
 function stopDrawing() {
   if (isDrawing) {
-    ctx.closePath();
     isDrawing = false;
   }
 }
 
 function handleTouchStart(e) {
+  if (currentTool === 'cursor') return;
   e.preventDefault();
   startDrawing(e);
 }
 
 function handleTouchMove(e) {
+  if (currentTool === 'cursor') return;
   e.preventDefault();
   draw(e);
 }
@@ -2750,21 +2824,17 @@ function handleTouchMove(e) {
 function addTextToCanvas(x, y) {
   const textPrompt = prompt("Masukkan catatan teks/perbaikan:");
   if (textPrompt && textPrompt.trim() !== "") {
-    // Simpan keadaan sebelum teks ditulis agar bisa di-undo
     saveCanvasState();
 
-    const colorInput = document.getElementById('pen-color');
-    const color = colorInput ? colorInput.value : '#dc2626';
-    
+    ctx.globalCompositeOperation = 'source-over';
     ctx.font = 'bold 16px sans-serif';
-    ctx.fillStyle = color;
+    ctx.fillStyle = getRgbaColor();
     ctx.fillText(textPrompt.trim(), x, y);
   }
 }
 
 function clearQuranCanvas() {
   if (ctx && canvas) {
-    // Simpan keadaan sebelum dihapus total agar aksi "Bersihkan" bisa di-undo
     saveCanvasState();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
@@ -3067,6 +3137,7 @@ function downloadQuranWithAnnotations() {
     alert("Gagal memuat gambar untuk diunduh. Pastikan tidak ada kendala koneksi.");
   };
 }
+
 
   </script>
 </body>
