@@ -10,150 +10,402 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Scrollbar halus untuk form input */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+    #quran-page-img {
+  min-width: 280px;
+  min-height: 400px;
+  object-fit: contain;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 8px;
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50; /* Memastikan melayang di atas input lain tanpa merusak layout */
+  max-height: 240px; /* Membatasi tinggi agar tidak menutupi seluruh layar */
+  overflow-y: auto; /* Menambahkan scroll di dalam dropdown */
+  background-color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 8px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+  /* ===== BASE & SCROLLBAR STYLES ===== */
+  * { box-sizing: border-box; }
+  html, body { width: 100%; min-width: 0; overflow-x: hidden; }
+  body { -webkit-text-size-adjust: 100%; }
+  button, input, select, textarea { max-width: 100%; }
 
-    .page { display: none !important; }
-    .page.active { display: block !important; }
+  .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    #app-layout.is-hidden { display: none !important; }
-    #app-layout.is-visible { display: flex !important; }
+  /* ===== PAGE & LAYOUT TOGGLES ===== */
+  .page { display: none !important; width: 100%; max-width: 100%; }
+  .page.active { display: block !important; }
+  .page > h2, .page h2 { line-height: 1.25; }
 
-    .autocomplete-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      max-height: 200px;
+  #app-layout.is-hidden { display: none !important; }
+
+  /* ===== AUTOCOMPLETE DROPDOWN ===== */
+  .autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  .autocomplete-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+  .autocomplete-item:hover {
+    background-color: #f1f5f9;
+    color: #059669;
+  }
+
+  /* ==========================================
+     DESKTOP STYLES (>= 1024px)
+     ========================================== */
+  @media (min-width: 1024px) {
+    #mobile-top-bar { display: none !important; }
+    
+    #app-layout.is-visible { display: flex !important; flex-direction: row !important; }
+    #app-layout > aside {
+      width: 260px !important;
+      min-width: 260px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
       overflow-y: auto;
-      background-color: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
-    .autocomplete-item {
-      padding: 0.5rem 0.75rem;
-      cursor: pointer;
-      font-size: 0.875rem;
+    #app-layout > main { min-width: 0; width: calc(100% - 260px); }
+  }
+
+  /* ==========================================
+     TABLET STYLES (768px - 1023px)
+     ========================================== */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #mobile-top-bar { display: none !important; }
+
+    #app-layout.is-visible { display: flex !important; flex-direction: row !important; }
+    #app-layout > aside {
+      width: 210px !important;
+      min-width: 210px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
     }
-    .autocomplete-item:hover {
-      background-color: #f1f5f9;
-      color: #059669;
+    #app-layout > main { min-width: 0; width: calc(100% - 210px); padding: 20px !important; }
+    
+    #app-layout aside nav { flex-direction: column !important; overflow-x: visible !important; }
+    #app-layout aside nav button { white-space: normal !important; text-align: left; }
+    
+    #page-input-data .xl\:col-span-4,
+    #page-input-data .xl\:col-span-8 { grid-column: span 12 / span 12 !important; }
+    #quran-viewport-container { min-height: 560px !important; }
+  }
+
+  /* ==========================================
+     MOBILE STYLES (< 767px) - BOTTOM BAR MODE
+     ========================================== */
+  @media (max-width: 767px) {
+    #app-layout.is-visible { display: block !important; position: relative; min-height: 100vh; }
+
+    /* 1. Sidebar disulap jadi Bottom Nav Bar */
+    #app-layout > aside > div:first-child { display: none !important; } /* Sembunyikan Logo Desktop */
+    
+    #app-layout > aside {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      top: auto !important;
+      width: 100% !important;
+      height: 60px !important;
+      z-index: 1000 !important;
+      background-color: #ffffff !important;
+      border-top: 1px solid #e2e8f0 !important;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      padding: 0 !important;
+      transform: none !important;
+      overflow: visible !important;
     }
-  </style>
+
+    #app-layout aside nav {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-around !important;
+      align-items: center !important;
+      height: 100% !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      overflow: visible !important;
+    }
+
+    .nav-btn {
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 6px 0 !important;
+      font-size: 11px !important;
+      font-weight: 500 !important;
+      color: #64748b !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+      gap: 2px !important;
+      width: auto !important;
+      min-height: auto !important;
+    }
+
+    .nav-btn i { width: 20px !important; height: 20px !important; }
+    .nav-btn.active { color: #059669 !important; font-weight: 700 !important; }
+
+    /* 2. Main Area (diberi spacing atas & bawah agar tidak tertutup bar) */
+    #app-layout > main {
+      width: 100% !important;
+      min-width: 0 !important;
+      padding: 68px 12px 76px 12px !important;
+      overflow-x: hidden;
+      overflow-y: auto !important;
+    }
+
+    /* 3. Penyesuaian Komponen Halaman untuk Layar Kecil */
+    #page-login { padding: 12px !important; }
+    #page-login > div { padding: 20px !important; border-radius: 18px; }
+
+    #page-dashboard .grid { gap: 10px !important; }
+    #page-dashboard .grid > div { min-width: 0; }
+
+    #page-master-data .grid,
+    #page-whatsapp-plan .grid,
+    #page-report .grid { min-width: 0; }
+    #page-master-data .grid > div,
+    #page-whatsapp-plan .grid > div { min-width: 0; }
+    #page-whatsapp-plan .grid.grid-cols-1.lg\:grid-cols-2 { grid-template-columns: 1fr !important; }
+    
+    input, select, textarea { font-size: 16px !important; } /* Cegah auto-zoom di iOS */
+    button { touch-action: manipulation; }
+
+    /* Quran Viewport Responsive */
+    #page-input-data .grid { grid-template-columns: 1fr !important; }
+    #page-input-data .xl\:col-span-4,
+    #page-input-data .xl\:col-span-8 { grid-column: span 1 / span 1 !important; }
+    #page-input-data .xl\:max-h-\[calc\(100vh-120px\)\] { max-height: none !important; }
+    #quran-viewport-container { min-height: 58vh !important; max-height: 72vh; }
+    #quran-zoom-wrapper { min-width: 100% !important; }
+    #quran-page-img { max-width: 100% !important; width: auto !important; height: auto !important; }
+    #quran-loading { top: 8px !important; left: 8px !important; right: 8px; justify-content: space-between; max-width: calc(100% - 16px); }
+    #quran-loading #loading-text { max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+    #page-input-data .bg-slate-100.p-2.my-2 { align-items: stretch !important; }
+    #page-input-data .bg-slate-100.p-2.my-2 > div { min-width: 0; }
+    #page-input-data .bg-slate-100.p-2.my-2 > div:nth-child(2) { border-left: 0 !important; border-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+    #page-input-data .bg-slate-100.p-2.my-2 > div:nth-child(2) > * { flex: 0 0 auto; }
+
+    /* Report & PDF Preview Mobile */
+    #page-report .bg-slate-200 { padding: 6px !important; overflow-x: hidden !important; }
+    #pdf-content {
+      min-width: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+      padding: 12px !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      font-size: 9px;
+    }
+    #pdf-content h1 { font-size: 12px !important; line-height: 1.35; }
+    #pdf-content h2 { font-size: 12px !important; }
+    #pdf-content table { width: 100% !important; table-layout: fixed; font-size: 8px !important; }
+    #pdf-content th, #pdf-content td { padding: 5px 3px !important; word-break: break-word; }
+    #pdf-content .grid-cols-2,
+    #pdf-content .sm\:grid-cols-2,
+    #pdf-content .sm\:grid-cols-3 { grid-template-columns: 1fr !important; }
+    #pdf-content .sm\:col-span-2 { grid-column: span 1 !important; }
+    #pdf-content .max-w-\[650px\] { max-width: 100% !important; }
+    #pdf-content .w-28, #pdf-content .w-32 { width: 34% !important; }
+
+    #page-report header button { width: 100%; justify-content: center; }
+    #page-whatsapp-plan button, #page-master-data button { min-height: 42px; }
+  }
+
+  /* ==========================================
+     VERY SMALL PHONES (< 380px)
+     ========================================== */
+  @media (max-width: 380px) {
+    #app-layout > main { padding: 62px 8px 72px 8px !important; }
+    #page-dashboard .grid > div { padding: 12px !important; }
+    #page-dashboard .grid > div > div:first-child { padding: 8px !important; }
+    #page-input-data .bg-slate-100.p-2.my-2 { gap: 4px !important; }
+    #quran-loading { font-size: 10px; }
+    #quran-page-num { width: 42px !important; }
+  }
+
+  /* ==========================================
+     SAFE AREA SUPPORT (iOS Home Indicator)
+     ========================================== */
+  @supports (padding: max(0px)) {
+    @media (max-width: 767px) {
+      #app-layout > main {
+        padding-left: max(12px, env(safe-area-inset-left)) !important;
+        padding-right: max(12px, env(safe-area-inset-right)) !important;
+        padding-bottom: max(76px, calc(env(safe-area-inset-bottom) + 65px)) !important;
+      }
+      #app-layout > aside {
+        padding-bottom: env(safe-area-inset-bottom) !important;
+        height: calc(60px + env(safe-area-inset-bottom)) !important;
+      }
+    }
+  }
+</style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen">
 
   <!-- LOG IN PAGE -->
   <div id="page-login" class="page active min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-emerald-600 to-teal-800">
-    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
-          <i data-lucide="book-open" class="w-8 h-8"></i>
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md">
+      <div class="text-center mb-6 sm:mb-8">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="book-open" class="w-7 h-7 sm:w-8 sm:h-8"></i>
         </div>
-        <h1 class="text-2xl font-bold text-slate-900">Mutabaah Tahfizh</h1>
-        <p class="text-sm text-slate-500 mt-1">Sistem Informasi Perkembangan Siswa</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Mutabaah Tahfizh</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Sistem Informasi Perkembangan Siswa</p>
       </div>
 
       <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Peran Akses</label>
-          <select id="login-role" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none">
+          <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Peran Akses</label>
+          <select id="login-role" class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none">
             <option value="guru">Guru Tahfizh</option>
             <option value="admin">Administrator / Koordinator Tahfizh</option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Username / NIP</label>
-          <input type="text" id="login-username" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin / guru">
+          <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Username / NIP</label>
+          <input type="text" id="login-username" required class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin / guru">
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Kata Sandi</label>
-          <input type="password" id="login-password" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin123 / guru123">
+          <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Kata Sandi</label>
+          <input type="password" id="login-password" required class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin123 / guru123">
         </div>
-        <button type="submit" id="btn-login-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2">
+        <button type="submit" id="btn-login-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 sm:py-3 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2 text-xs sm:text-sm">
           Masuk ke Dashboard
         </button>
       </form>
     </div>
   </div>
 
-  <!-- MAIN APP LAYOUT -->
-  <div id="app-layout" class="is-hidden min-h-screen flex-col md:flex-row">
-    
-    <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0">
-      <div class="p-6 border-b border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <i data-lucide="book-open" class="text-emerald-400 w-6 h-6"></i>
-          <span class="font-bold text-white text-lg">TahfizhApp</span>
-        </div>
-        <span id="user-badge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-medium">GURU</span>
+ <!-- MAIN APP LAYOUT -->
+<div id="app-layout" class="is-hidden min-h-screen">
+  
+  <!-- MOBILE TOP BAR (Hanya Tampil di HP) -->
+  <header id="mobile-top-bar" class="fixed top-0 left-0 right-0 h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between z-40">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleMobileMenu()" class="text-slate-600">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+      <div>
+        <h1 class="font-bold text-emerald-700 text-base leading-tight">TahfizhApp</h1>
+        <p id="mobile-page-title" class="text-xs text-slate-500">Dashboard</p>
       </div>
-      <nav class="p-4 space-y-1">
-        <button onclick="switchPage('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
-          <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
-        </button>
-        
-        <button id="nav-master-data" onclick="switchPage('master-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200 hidden">
-          <i data-lucide="database" class="w-5 h-5"></i> Kelola Master Data
-        </button>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <span id="user-badge-mobile" class="bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2.5 py-1 rounded-full">
+        Guru
+      </span>
+      <button onclick="handleLogout()" class="text-slate-500 hover:text-rose-600 p-1">
+        <i data-lucide="log-out" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </header>
 
-        <button onclick="switchPage('whatsapp-plan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
-          <i data-lucide="send" class="w-5 h-5"></i> Pesan WA Orang Tua
-        </button>
-        <button onclick="switchPage('input-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
-          <i data-lucide="edit-3" class="w-5 h-5"></i> Input Setoran Harian
-        </button>
-        <button onclick="switchPage('report')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-200">
-          <i data-lucide="file-text" class="w-5 h-5"></i> Cetak Laporan PDF
-        </button>
-        <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-rose-900/40 text-rose-400 transition-colors mt-8">
-          <i data-lucide="log-out" class="w-5 h-5"></i> Keluar
-        </button>
-      </nav>
-    </aside>
+  <!-- SIDEBAR (DESKTOP) / BOTTOM BAR (MOBILE) -->
+  <aside class="bg-slate-900 md:bg-slate-900 text-slate-300 flex-shrink-0">
+    <!-- Header Sidebar Desktop -->
+    <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i data-lucide="book-open" class="text-emerald-400 w-6 h-6"></i>
+        <span class="font-bold text-white text-base sm:text-lg">TahfizhApp</span>
+      </div>
+      <span id="user-badge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-medium">GURU</span>
+    </div>
 
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <!-- Navigasi Menu -->
+    <nav class="p-3 sm:p-4 flex md:flex-col custom-scrollbar">
+      <button onclick="switchPage('dashboard')" class="nav-btn active flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+        <i data-lucide="layout-dashboard" class="shrink-0"></i>
+        <span>Home</span>
+      </button>
+      
+      <button id="nav-master-data" onclick="switchPage('master-data')" class="nav-btn hidden flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+        <i data-lucide="database" class="shrink-0"></i>
+        <span>Siswa</span>
+      </button>
+
+      <button onclick="switchPage('input-data')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+        <i data-lucide="edit-3" class="shrink-0"></i>
+        <span>Setoran</span>
+      </button>
+
+      <button onclick="switchPage('whatsapp-plan')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+        <i data-lucide="send" class="shrink-0"></i>
+        <span>Pesan WA</span>
+      </button>
+
+      <button onclick="switchPage('report')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+        <i data-lucide="file-text" class="shrink-0"></i>
+        <span>Laporan</span>
+      </button>
+
+      <!-- Tombol Keluar (Hanya Tampil di Desktop Sidebar) -->
+      <button onclick="handleLogout()" class="hidden md:flex items-center gap-3 px-4 py-3 text-sm rounded-lg hover:bg-rose-900/40 text-rose-400 transition-colors md:mt-auto">
+        <i data-lucide="log-out" class="shrink-0"></i>
+        <span>Keluar</span>
+      </button>
+    </nav>
+  </aside>
+
+    <main class="flex-1 p-3 sm:p-6 md:p-8 overflow-y-auto">
       
       <!-- DASHBOARD -->
       <section id="page-dashboard" class="page space-y-6">
         <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h2 class="text-2xl font-bold text-slate-900">Dashboard Ringkasan</h2>
-            <p class="text-slate-500 text-sm">Ringkasan statistik dan perkembangan hafalan siswa.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard Ringkasan</h2>
+            <p class="text-slate-500 text-xs sm:text-sm">Ringkasan statistik dan perkembangan hafalan siswa.</p>
           </div>
         </header>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+          <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="users"></i></div>
-            <div><p class="text-xs text-slate-500">Total Siswa</p><p id="stat-total-siswa" class="text-xl font-bold">0 Siswa</p></div>
+            <div><p class="text-xs text-slate-500">Total Siswa</p><p id="stat-total-siswa" class="text-lg sm:text-xl font-bold">0 Siswa</p></div>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+          <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div class="p-3 bg-teal-100 text-teal-600 rounded-lg"><i data-lucide="award"></i></div>
-            <div><p class="text-xs text-slate-500">Rata-rata Capaian</p><p id="stat-rata-capaian" class="text-xl font-bold">Baik</p></div>
+            <div><p class="text-xs text-slate-500">Rata-rata Capaian</p><p id="stat-rata-capaian" class="text-lg sm:text-xl font-bold">Baik</p></div>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+          <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div class="p-3 bg-amber-100 text-amber-600 rounded-lg"><i data-lucide="clock"></i></div>
-            <div><p class="text-xs text-slate-500">Status Muraja'ah</p><p id="stat-murajaah" class="text-xl font-bold text-emerald-600">Aktif</p></div>
+            <div><p class="text-xs text-slate-500">Status Muraja'ah</p><p id="stat-murajaah" class="text-lg sm:text-xl font-bold text-emerald-600">Aktif</p></div>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+          <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="calendar"></i></div>
-            <div><p class="text-xs text-slate-500">Sistem</p><p class="text-xl font-bold text-emerald-600">Terhubung</p></div>
+            <div><p class="text-xs text-slate-500">Sistem</p><p class="text-lg sm:text-xl font-bold text-emerald-600">Terhubung</p></div>
           </div>
         </div>
       </section>
@@ -161,73 +413,73 @@
       <!-- MASTER DATA -->
       <section id="page-master-data" class="page space-y-6">
         <div>
-          <h2 class="text-2xl font-bold text-slate-900">Kelola Master Data</h2>
-          <p class="text-slate-500 text-sm">Tambahkan data siswa, guru, kelas/halqah, dan akun pengguna baru.</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Kelola Master Data</h2>
+          <p class="text-slate-500 text-xs sm:text-sm">Tambahkan data siswa, guru, kelas/halqah, dan akun pengguna baru.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="user-plus" class="text-emerald-600"></i> Tambah Siswa Baru
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="user-plus" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Siswa Baru
             </h3>
-            <form onsubmit="handleMasterSubmit(event, 'Siswa')" class="space-y-3">
+            <form onsubmit="handleMasterSubmit(event, 'Siswa')" class="space-y-3 text-xs sm:text-sm">
               <div>
-                <label class="block text-sm font-medium mb-1">Nama Lengkap Siswa</label>
+                <label class="block font-medium mb-1">Nama Lengkap Siswa</label>
                 <input type="text" id="master-siswa-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Masukkan nama siswa">
               </div>
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-sm font-medium mb-1">NIS / NISN</label>
+                  <label class="block font-medium mb-1">NIS / NISN</label>
                   <input type="text" id="master-siswa-nis" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="123456">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium mb-1">Kelas / Halqah</label>
-                  <select id="master-siswa-kelas" required class="select-kelas-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                  <label class="block font-medium mb-1">Kelas / Halqah</label>
+                  <select id="master-siswa-kelas" required class="select-kelas-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                     <option value="" disabled selected>-- Pilih Kelas --</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">Nomor WhatsApp Orang Tua</label>
+                <label class="block font-medium mb-1">Nomor WhatsApp Orang Tua</label>
                 <input type="text" id="master-siswa-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="628123456789">
               </div>
               <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Siswa</button>
             </form>
           </div>
 
-          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="user-check" class="text-emerald-600"></i> Tambah Guru / Ustaz
+          <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="user-check" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Guru / Ustaz
             </h3>
-            <form onsubmit="handleMasterSubmit(event, 'Guru')" class="space-y-3">
+            <form onsubmit="handleMasterSubmit(event, 'Guru')" class="space-y-3 text-xs sm:text-sm">
               <div>
-                <label class="block text-sm font-medium mb-1">Nama Lengkap Guru</label>
+                <label class="block font-medium mb-1">Nama Lengkap Guru</label>
                 <input type="text" id="master-guru-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ust. Fulan, S.Pd">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">NIP / ID Guru</label>
+                <label class="block font-medium mb-1">NIP / ID Guru</label>
                 <input type="text" id="master-guru-nip" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="GURU-001">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">No. WhatsApp</label>
+                <label class="block font-medium mb-1">No. WhatsApp</label>
                 <input type="text" id="master-guru-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="628123456789">
               </div>
               <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Guru</button>
             </form>
           </div>
 
-          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="school" class="text-emerald-600"></i> Tambah Kelas / Halqah Baru
+          <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="school" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Kelas / Halqah Baru
             </h3>
-            <form onsubmit="handleMasterSubmit(event, 'Kelas')" class="space-y-3">
+            <form onsubmit="handleMasterSubmit(event, 'Kelas')" class="space-y-3 text-xs sm:text-sm">
               <div>
-                <label class="block text-sm font-medium mb-1">Nama Kelas / Halqah</label>
+                <label class="block font-medium mb-1">Nama Kelas / Halqah</label>
                 <input type="text" id="master-kelas-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="contoh: 8A - Mus'ab bin 'Umair">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">Guru Pembimbing / Musyrif</label>
-                <select id="master-kelas-guru" required class="select-guru-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                <label class="block font-medium mb-1">Guru Pembimbing / Musyrif</label>
+                <select id="master-kelas-guru" required class="select-guru-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                   <option value="" disabled selected>-- Pilih Guru --</option>
                 </select>
               </div>
@@ -235,22 +487,22 @@
             </form>
           </div>
 
-          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="shield-check" class="text-emerald-600"></i> Tambah Akun User Pengguna
+          <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
+              <i data-lucide="shield-check" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Akun User Pengguna
             </h3>
-            <form onsubmit="handleMasterSubmit(event, 'User')" class="space-y-3">
+            <form onsubmit="handleMasterSubmit(event, 'User')" class="space-y-3 text-xs sm:text-sm">
               <div>
-                <label class="block text-sm font-medium mb-1">Username Pengguna</label>
+                <label class="block font-medium mb-1">Username Pengguna</label>
                 <input type="text" id="master-user-name" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="username_login">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">Kata Sandi (Password)</label>
+                <label class="block font-medium mb-1">Kata Sandi (Password)</label>
                 <input type="password" id="master-user-pass" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="••••••••">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">Peran Akses (Role)</label>
-                <select id="master-user-role" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500">
+                <label class="block font-medium mb-1">Peran Akses (Role)</label>
+                <select id="master-user-role" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
                   <option value="guru">Guru Tahfizh</option>
                   <option value="admin">Administrator / Koordinator Tahfizh</option>
                 </select>
@@ -261,149 +513,136 @@
         </div>
       </section>
 
- <!-- WA GENERATOR & PLANNER -->
-<section id="page-whatsapp-plan" class="page space-y-6">
-  <h2 class="text-2xl font-bold text-slate-900">Perencanaan Harian & Kirim WA</h2>
-  
-  <!-- Container Utama 2 Kolom (Kiri: Form, Kanan: Preview WA) -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-    <!-- KOLOM KIRI: FORM TARGET & LAPORAN -->
-    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-      <h3 class="font-bold text-slate-800 border-b pb-2">Form Target & Laporan Setoran</h3>
-      
-      <!-- Sub-Grid Form Header -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <!-- WA GENERATOR & PLANNER -->
+      <section id="page-whatsapp-plan" class="page space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Perencanaan Harian & Kirim WA</h2>
         
-        <!-- Tanggal Target Besok -->
-        <div>
-          <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Target Besok</label>
-          <input type="date" id="wa-tanggal-target" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        <!-- Tanggal Laporan + Tombol Cari (Desain Input Group menyatu) -->
-        <div>
-          <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Laporan</label>
-          <div class="flex items-center">
-            <input type="date" id="wa-tanggal-laporan" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-l-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 border-r-0">
-            <button type="button" onclick="muatDataLaporanHarian()" title="Cari Data Laporan" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-r-lg text-xs font-medium transition-colors flex items-center justify-center shrink-0 shadow-sm gap-1">
-              <i data-lucide="search" class="w-3.5 h-3.5"></i>
-              <span>Cari</span>
+          <!-- KOLOM KIRI: FORM TARGET & LAPORAN -->
+          <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-800 border-b pb-2 text-sm sm:text-base">Form Target & Laporan Setoran</h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Target Besok</label>
+                <input type="date" id="wa-tanggal-target" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Laporan</label>
+                <div class="flex items-center">
+                  <input type="date" id="wa-tanggal-laporan" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-l-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 border-r-0">
+                  <button type="button" onclick="muatDataLaporanHarian()" title="Cari Data Laporan" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-r-lg text-xs font-medium transition-colors flex items-center justify-center shrink-0 shadow-sm gap-1">
+                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                    <span>Cari</span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium mb-1 text-slate-600">Filter Kelas</label>
+                <select id="wa-filter-kelas" onchange="filterSiswaByKelas('wa-filter-kelas', 'wa-siswa')" class="select-kelas-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                  <option value="">-- Semua --</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium mb-1 text-slate-600">No. WA Ortu</label>
+                <input type="text" id="wa-nomor" placeholder="628xxx" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium mb-1 text-slate-600">Pilih Siswa</label>
+                <select id="wa-siswa" onchange="loadTargetWABySiswa()" class="select-siswa-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                  <option value="" disabled selected>-- Memuat... --</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Target 1: Ziyadah -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-emerald-800 block">1. Target Ziyadah Besok (Hafalan Baru)</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="relative">
+                  <input type="text" id="wa-ziyadah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <div id="wa-ziyadah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div class="relative">
+                  <input type="text" id="wa-ziyadah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <div id="wa-ziyadah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Target 2: Tahsin -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-emerald-800 block">2. Target Tahsin / Iqro Besok</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="relative">
+                  <input type="text" id="wa-tahsin-dari" autocomplete="off" placeholder="Dari Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <div id="wa-tahsin-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div class="relative">
+                  <input type="text" id="wa-tahsin-sampai" autocomplete="off" placeholder="Sampai Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <div id="wa-tahsin-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Target 3: Murajaah -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+              <span class="text-xs font-bold text-emerald-800 block">3. Target Murajaah Besok (Pengulangan)</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="relative">
+                  <input type="text" id="wa-murajaah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <div id="wa-murajaah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+                <div class="relative">
+                  <input type="text" id="wa-murajaah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <div id="wa-murajaah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium mb-1 text-slate-600">Catatan Tambahan Pembimbing</label>
+              <textarea id="wa-catatan" oninput="generateWaText()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500" rows="2" placeholder="Tuliskan pesan khusus untuk orang tua..."></textarea>
+            </div>
+
+            <button onclick="saveRencanaWA()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-xs md:text-sm">
+              <i data-lucide="save" class="w-4 h-4"></i> Simpan Rencana Target ke Google Sheets
             </button>
           </div>
-        </div>
 
-        <!-- Filter Kelas -->
-        <div>
-          <label class="block text-xs font-medium mb-1 text-slate-600">Filter Kelas</label>
-          <select id="wa-filter-kelas" onchange="filterSiswaByKelas('wa-filter-kelas', 'wa-siswa')" class="select-kelas-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-            <option value="">-- Semua --</option>
-          </select>
-        </div>
-
-        <!-- No. WA Ortu -->
-        <div>
-          <label class="block text-xs font-medium mb-1 text-slate-600">No. WA Ortu</label>
-          <input type="text" id="wa-nomor" placeholder="628xxx" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-        </div>
-
-        <!-- Pilih Siswa (Span 2 Kolom Penuh) -->
-        <div class="sm:col-span-2">
-          <label class="block text-xs font-medium mb-1 text-slate-600">Pilih Siswa</label>
-          <select id="wa-siswa" onchange="loadTargetWABySiswa()" class="select-siswa-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
-            <option value="" disabled selected>-- Memuat... --</option>
-          </select>
-        </div>
-
-      </div>
-
-      <!-- Target 1: Ziyadah -->
-      <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-        <span class="text-xs font-bold text-emerald-800 block">1. Target Ziyadah Besok (Hafalan Baru)</span>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <div class="relative">
-            <input type="text" id="wa-ziyadah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-            <div id="wa-ziyadah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
+          <!-- KOLOM KANAN: PREVIEW PESAN WA -->
+          <div class="bg-slate-100 p-4 sm:p-6 rounded-xl border border-slate-300 flex flex-col justify-between h-full">
+            <div>
+              <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                <i data-lucide="eye" class="w-4 h-4 text-emerald-600"></i> Preview Pesan WhatsApp
+              </h3>
+              <div id="wa-preview" class="bg-white p-3 sm:p-4 rounded-lg shadow-inner text-xs sm:text-sm font-mono whitespace-pre-wrap text-slate-700 border border-slate-200 min-h-[250px] sm:min-h-[350px]">
+              </div>
+            </div>
+            <button onclick="sendWhatsApp()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 sm:py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-xs sm:text-sm">
+              <i data-lucide="message-circle" class="w-4 h-4"></i> Kirim Langsung via WhatsApp
+            </button>
           </div>
-          <div class="relative">
-            <input type="text" id="wa-ziyadah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-            <div id="wa-ziyadah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
-          </div>
+
         </div>
-      </div>
+      </section>
 
-      <!-- Target 2: Tahsin -->
-      <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-        <span class="text-xs font-bold text-emerald-800 block">2. Target Tahsin / Iqro Besok</span>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <div class="relative">
-            <input type="text" id="wa-tahsin-dari" autocomplete="off" placeholder="Dari Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-            <div id="wa-tahsin-dari-dropdown" class="autocomplete-dropdown hidden"></div>
-          </div>
-          <div class="relative">
-            <input type="text" id="wa-tahsin-sampai" autocomplete="off" placeholder="Sampai Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-            <div id="wa-tahsin-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Target 3: Murajaah -->
-      <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-        <span class="text-xs font-bold text-emerald-800 block">3. Target Murajaah Besok (Pengulangan)</span>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <div class="relative">
-            <input type="text" id="wa-murajaah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-            <div id="wa-murajaah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
-          </div>
-          <div class="relative">
-            <input type="text" id="wa-murajaah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
-            <div id="wa-murajaah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Catatan Tambahan -->
-      <div>
-        <label class="block text-xs font-medium mb-1 text-slate-600">Catatan Tambahan Pembimbing</label>
-        <textarea id="wa-catatan" oninput="generateWaText()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500" rows="2" placeholder="Tuliskan pesan khusus untuk orang tua..."></textarea>
-      </div>
-
-      <!-- Tombol Simpan Rencana -->
-      <button onclick="saveRencanaWA()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-xs md:text-sm">
-        <i data-lucide="save" class="w-4 h-4"></i> Simpan Rencana Target ke Google Sheets
-      </button>
-    </div>
-
-    <!-- KOLOM KANAN: PREVIEW PESAN WA -->
-    <div class="bg-slate-100 p-6 rounded-xl border border-slate-300 flex flex-col justify-between h-full">
-      <div>
-        <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-          <i data-lucide="eye" class="w-4 h-4 text-emerald-600"></i> Preview Pesan WhatsApp
-        </h3>
-        <div id="wa-preview" class="bg-white p-4 rounded-lg shadow-inner text-xs md:text-sm font-mono whitespace-pre-wrap text-slate-700 border border-slate-200 min-h-[350px]">
-        </div>
-      </div>
-      <button onclick="sendWhatsApp()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-xs md:text-sm">
-        <i data-lucide="message-circle" class="w-4 h-4"></i> Kirim Langsung via WhatsApp
-      </button>
-    </div>
-
-  </div>
-</section>
-
-
-
- <!-- INPUT DATA MUTABAAH -->
+<!-- INPUT DATA MUTABAAH -->
 <section id="page-input-data" class="page space-y-4">
-  <h2 class="text-2xl font-bold text-slate-900">Input Mutabaah Harian Siswa</h2>
+  <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Input Mutabaah Harian Siswa</h2>
 
-  <!-- Container Grid Utama (Tinggi Terkunci Sejajar Viewport) -->
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start h-[calc(100vh-110px)]">
+  <!-- Container Grid Utama: h-auto di Mobile & Tablet, xl:h-[calc(100vh-110px)] hanya di Desktop -->
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start h-auto xl:h-[calc(100vh-110px)]">
 
     <!-- ================= KOLOM KIRI: FORM INPUT SCROLLABLE ================= -->
-    <div class="xl:col-span-4 bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col h-full overflow-hidden">
+    <div class="w-full xl:col-span-4 bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col h-auto xl:h-full overflow-hidden shrink-0">
       
-      <!-- Container Scrollable: Memenuhi sisa tinggi dengan inner scroll -->
+      <!-- Container Scrollable -->
       <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
         <form id="form-mutabaah" onsubmit="submitMutabaah(event)" class="space-y-4">
         
@@ -613,25 +852,25 @@
     </div>
 
     <!-- ================= KOLOM KANAN: MUSHAF AL-QUR'AN & FITUR ZOOM ================= -->
-    <div class="xl:col-span-8 bg-white rounded-2xl shadow-xl p-3 border border-slate-200 flex flex-col h-full overflow-hidden">
+    <div class="w-full xl:col-span-8 bg-white rounded-2xl shadow-xl p-3 border border-slate-200 flex flex-col h-auto xl:h-full overflow-hidden">
 
       <!-- 1. Filter Pencarian Surah & Juz -->
-      <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 shadow-sm space-y-1.5 flex-shrink-0">
+      <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 shadow-sm space-y-2 shrink-0">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <!-- Search Input Surah -->
-          <div class="relative">
+          <div class="relative w-full">
             <input type="text" 
                    id="search-surah-input" 
                    oninput="filterSurahList(this.value)" 
                    placeholder="Cari nama surah... (contoh: Al-Baqarah)" 
-                   class="w-full pl-8 pr-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500">
-            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+                   class="w-full pl-8 pr-2 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-h-[36px]">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5"></i>
           </div>
 
           <!-- Filter Dropdown Juz -->
           <select id="select-mushaf-juz" 
                   onchange="jumpToJuz(this.value)" 
-                  class="w-full py-1.5 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                  class="w-full py-2 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer min-h-[36px]">
             <option value="">-- Pilih Juz (1 - 30) --</option>
           </select>
         </div>
@@ -639,15 +878,16 @@
         <!-- Dropdown Hasil Surah -->
         <select id="select-mushaf-surah" 
                 onchange="jumpToSurah(this.value)" 
-                class="w-full py-1.5 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                class="w-full py-2 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer min-h-[36px]">
           <option value="">-- Pilih Surah --</option>
         </select>
       </div>
 
-      <!-- 2. Toolbar Navigasi, Alat Coret, & Fitur Zoom -->
-      <div class="bg-slate-100 p-2 my-2 rounded-xl flex flex-wrap items-center justify-between gap-2 border border-slate-200 flex-shrink-0">
+      <!-- 2. Toolbar Navigasi & Alat Coret -->
+      <div class="bg-slate-100 p-2 my-2 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-2 border border-slate-200 shrink-0 max-h-40 sm:max-h-none overflow-y-auto sm:overflow-visible custom-scrollbar">
+        
         <!-- Navigasi Halaman Mushaf -->
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 shrink-0">
           <button type="button" onclick="changeQuranPage(-1)" class="p-1 bg-white hover:bg-slate-200 rounded-lg text-slate-700 border border-slate-200 transition-colors" title="Halaman Sebelumnya">
             <i data-lucide="chevron-left" class="w-4 h-4"></i>
           </button>
@@ -663,300 +903,267 @@
           </button>
         </div>
 
-    <!-- Mode Alat Canvas -->
-<div class="flex items-center gap-1.5 border-l border-r px-2 border-slate-300">
-  <!-- Mode Kursor Default (Navigasi / Scroll) -->
-  <button type="button" id="tool-cursor" onclick="setCanvasTool('cursor')" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors" title="Mode Kursor (Navigasi/Scroll)">
-    <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i>
-  </button>
+        <!-- Mode Alat Canvas -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5 border-t sm:border-t-0 sm:border-l sm:border-r pt-2 sm:pt-0 border-slate-300 shrink-0 px-2">
+          <button type="button" id="tool-cursor" onclick="setCanvasTool('cursor')" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors" title="Mode Kursor">
+            <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i>
+          </button>
 
-  <!-- Mode Pena -->
-  <button type="button" id="tool-pen" onclick="setCanvasTool('pen')" class="p-1.5 bg-emerald-600 text-white rounded-lg transition-colors" title="Coret / Bulatkan (Pena)">
-    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-  </button>
+          <button type="button" id="tool-pen" onclick="setCanvasTool('pen')" class="p-1.5 bg-emerald-600 text-white rounded-lg transition-colors" title="Pena">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+          </button>
 
-  <!-- Mode Teks -->
-  <button type="button" id="tool-text" onclick="setCanvasTool('text')" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors" title="Tambah Catatan Teks">
-    <i data-lucide="type" class="w-3.5 h-3.5"></i>
-  </button>
+          <button type="button" id="tool-text" onclick="setCanvasTool('text')" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors" title="Teks">
+            <i data-lucide="type" class="w-3.5 h-3.5"></i>
+          </button>
 
-  <!-- Mode Penghapus -->
-  <button type="button" id="tool-eraser" onclick="setCanvasTool('eraser')" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors" title="Penghapus Coretan">
-    <i data-lucide="eraser" class="w-3.5 h-3.5"></i>
-  </button>
+          <button type="button" id="tool-eraser" onclick="setCanvasTool('eraser')" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors" title="Penghapus">
+            <i data-lucide="eraser" class="w-3.5 h-3.5"></i>
+          </button>
 
-  <!-- Color Picker + Opacity Slider Group -->
-  <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200" title="Pengaturan Warna & Transparansi">
-    <input type="color" id="pen-color" value="#dc2626" class="w-6 h-6 rounded cursor-pointer border border-slate-300 p-0 bg-transparent" title="Pilih Warna">
-    
-<!-- Slider Opacity (0% - 100%) -->
-<div class="flex items-center gap-1 px-1">
-  <input type="range" 
-         id="pen-opacity" 
-         min="0" 
-         max="100" 
-         value="40" 
-         step="5" 
-         class="w-12 h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-600" 
-         title="Transparansi Warna">
-  <span id="opacity-label" class="text-[10px] font-semibold text-slate-600 w-6 text-right select-none">40%</span>
-</div>
-  </div>
+          <!-- Color Picker & Opacity -->
+          <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <input type="color" id="pen-color" value="#dc2626" class="w-6 h-6 rounded cursor-pointer border border-slate-300 p-0 bg-transparent">
+            
+            <div class="flex items-center gap-1 px-1">
+              <input type="range" id="pen-opacity" min="0" max="100" value="40" step="5" class="w-12 h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+              <span id="opacity-label" class="text-[10px] font-semibold text-slate-600 w-6 text-right select-none">40%</span>
+            </div>
+          </div>
 
-  <!-- Tombol Undo -->
-  <button type="button" onclick="undoQuranCanvas()" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors ml-0.5" title="Batalkan Coretan Terakhir (Undo)">
-    <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
-  </button>
+          <button type="button" onclick="undoQuranCanvas()" class="p-1.5 bg-white hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg transition-colors ml-0.5" title="Undo">
+            <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
+          </button>
 
-  <!-- Tombol Download / Drag Handle -->
-  <button type="button" 
-          id="drag-handle" 
-          onclick="downloadQuranWithAnnotations()" 
-          title="Klik untuk Unduh, Tahan untuk Geser"
-          class="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-grab active:cursor-grabbing transition-all flex items-center justify-center ml-0.5">
-    <svg id="download-icon" class="w-4 h-4 origin-center transition-transform duration-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-    </svg>
-  </button>
-</div>
+          <button type="button" id="download-btn-handle" onclick="downloadQuranWithAnnotations()" title="Unduh" class="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all flex items-center justify-center ml-0.5">
+            <svg id="download-icon" class="w-4 h-4 origin-center transition-transform duration-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+          </button>
+        </div>
 
-        <!-- Tombol Bersihkan -->
-        <button type="button" onclick="clearQuranCanvas()" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1" title="Hapus Semua Coretan">
+        <button type="button" onclick="clearQuranCanvas()" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 shrink-0">
           <i data-lucide="trash-2" class="w-3 h-3"></i> Bersihkan
         </button>
       </div>
 
-      <!-- 3. Kontainer Gambar Mushaf -->
-<div id="quran-viewport-container" class="relative flex-1 w-full overflow-auto border border-slate-200 rounded-xl bg-slate-50">
-  
-  <!-- FLOATING BOX (Bisa Di-drag & Di-zoom) -->
-  <div id="quran-loading" class="absolute top-4 left-4 z-50 flex items-center gap-3 bg-white/95 shadow-xl border border-slate-300 p-3 rounded-2xl select-none touch-none transition-shadow hover:shadow-2xl">
-    
-    <!-- Area Content (Bisa Di-drag) -->
-    <div id="drag-handle" class="flex items-center gap-2.5 cursor-grab active:cursor-grabbing pr-2 border-r border-slate-200">
-      <div class="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
-      <span id="loading-text" class="text-xs font-semibold text-slate-700 whitespace-nowrap origin-left transition-transform duration-75">
-        Memuat Halaman Qur'an...
-      </span>
-    </div>
+      <!-- 3. Kontainer Gambar Mushaf (Tinggi fleksibel di HP agar gambar mushaf tampil utuh & tidak bertumpuk) -->
+      <div id="quran-viewport-container" class="relative flex-1 w-full min-h-[450px] sm:min-h-[550px] overflow-auto border border-slate-200 rounded-xl bg-slate-50">
+        
+        <!-- FLOATING BOX -->
+        <div id="quran-loading" class="absolute top-4 left-4 z-50 flex items-center gap-3 bg-white/95 shadow-xl border border-slate-300 p-3 rounded-2xl select-none touch-none transition-shadow hover:shadow-2xl">
+          <div id="drag-handle" class="flex items-center gap-2.5 cursor-grab active:cursor-grabbing pr-2 border-r border-slate-200">
+            <div class="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+            <span id="loading-text" class="text-xs font-semibold text-slate-700 whitespace-nowrap origin-left transition-transform duration-75">
+              Memuat Halaman Qur'an...
+            </span>
+          </div>
 
-    <!-- Tombol Kontrol Ukuran Teks (Zoom In / Zoom Out) -->
-    <div class="flex items-center gap-1">
-      <button type="button" id="btn-zoom-out" class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold active:scale-95 transition-all">
-        -
-      </button>
-      <button type="button" id="btn-zoom-in" class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold active:scale-95 transition-all">
-        +
-      </button>
+          <div class="flex items-center gap-1">
+            <button type="button" id="btn-zoom-out" class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold active:scale-95 transition-all">-</button>
+            <button type="button" id="btn-zoom-in" class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold active:scale-95 transition-all">+</button>
+          </div>
+        </div>
+
+        <!-- Outer Zoom Wrapper -->
+        <div id="quran-zoom-wrapper" class="relative transition-transform duration-150 origin-center flex justify-center items-center min-w-full min-h-full m-auto">
+          <img id="quran-page-img" 
+               src="https://cdn.jsdelivr.net/gh/quranpedia/quran-svg@main/mushafs/hafs/kfqc/svg/001.svg" 
+               alt="Halaman Al-Qur'an" 
+               class="max-w-full max-h-full object-contain p-1 select-none pointer-events-none" 
+               onload="handleImageLoaded()"
+               onerror="handleImageError()">
+          
+          <canvas id="quran-drawing-canvas" class="absolute top-0 left-0 cursor-crosshair z-20"></canvas>
+        </div>
+
+      </div>
     </div>
 
   </div>
-
-  <!-- Outer Zoom Wrapper -->
-  <div id="quran-zoom-wrapper" class="relative transition-transform duration-150 origin-center flex justify-center items-center min-w-full min-h-full m-auto">
-    
-    <!-- Gambar SVG Mushaf -->
-    <img id="quran-page-img" 
-         src="https://raw.githubusercontent.com/quranpedia/quran-svg/main/mushafs/hafs/kfqc/svg/001.svg" 
-         alt="Halaman Al-Qur'an" 
-         class="max-w-full max-h-full object-contain p-1 select-none pointer-events-none" 
-         onload="handleImageLoaded()"
-         onerror="handleImageError()">
-    
-    <!-- Canvas Coretan Presisi -->
-    <canvas id="quran-drawing-canvas" class="absolute top-0 left-0 cursor-crosshair z-20"></canvas>
-  </div>
-
-</div>
 </section>
 
-<!-- LAPORAN PDF -->
-<section id="page-report" class="page space-y-6">
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-    <div>
-      <h2 class="text-2xl font-bold text-slate-900">Laporan Bulanan Siswa</h2>
-      <p class="text-slate-500 text-sm">Pilih siswa dan bulan untuk melihat ringkasan perkembangan hafalan.</p>
-    </div>
-    <button onclick="downloadPDF()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 flex items-center gap-2 transition-colors">
-      <i data-lucide="download"></i> Export ke PDF
-    </button>
-  </div>
-
-  <!-- FILTER & INPUT MANUAL -->
-  <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Filter Kelas</label>
-        <select id="report-filter-kelas" onchange="filterSiswaByKelas('report-filter-kelas', 'report-filter-siswa')" class="select-kelas-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-          <option value="">-- Semua Kelas --</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Siswa (Otomatis)</label>
-        <select id="report-filter-siswa" onchange="updateReportSiswaInfo(); loadReportData();" class="select-siswa-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-          <option value="" disabled selected>-- Memuat Siswa... --</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Bulan & Tahun</label>
-        <input type="month" id="report-filter-bulan" onchange="loadReportData()" class="w-full bg-slate-50 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-      </div>
-      <div class="flex items-end">
-        <button onclick="loadReportData()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium h-[38px] rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
-          <i data-lucide="filter" class="w-4 h-4"></i> Tampilkan
-        </button>
-      </div>
-    </div>
-
-    <!-- INPUT MANUAL TAMBAHAN -->
-    <div class="border-t pt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Semester (Input Manual)</label>
-        <input type="text" id="manual-input-semester" oninput="updateReportManualInputs()" value="1 (SATU)" placeholder="Contoh: 1 (SATU)" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tahun Pelajaran (Input Manual)</label>
-        <input type="text" id="manual-input-thn-ajaran" oninput="updateReportManualInputs()" value="2025/2026" placeholder="Contoh: 2025/2026" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
-      </div>
-      <div class="md:col-span-2">
-        <label class="block text-xs font-semibold text-amber-800 uppercase mb-1 flex items-center gap-1">
-          <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Catatan / Evaluasi Guru (Input Manual)
-        </label>
-        <textarea id="report-input-evaluasi" oninput="updateReportManualInputs()" rows="2" placeholder="Tuliskan evaluasi bulanan di sini..." class="w-full bg-amber-50/50 border border-amber-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
-      </div>
-    </div>
-  </div>
-
- <!-- HASIL PREVIEW TAMPILAN LAPORAN PDF -->
-<div class="bg-slate-200 p-4 md:p-8 rounded-xl overflow-x-auto flex justify-center">
-  <div id="pdf-content" class="bg-white p-8 md:p-12 rounded-sm shadow-xl w-full max-w-[800px] text-slate-800 space-y-6">
-    
-    <!-- BANNER HEADER SCHOOL -->
-    <div class="w-full flex justify-center">
-      <img src="kopbisc.PNG" alt="Header Bandung Islamic School" class="w-full h-auto object-contain rounded-sm mx-auto" />
-    </div>
-
-    <!-- JUDUL RAPOR -->
-    <div class="text-center space-y-1 my-4 border-b border-slate-200 pb-3">
-      <h2 class="text-xl font-bold font-serif dir-rtl text-center">كشف الدرجات لتحفيظ القرآن</h2>
-      <h1 class="text-lg font-extrabold text-slate-900 tracking-wide uppercase text-center">LAPORAN BULANAN TAHFIZH DAN TAHSIN AL QURAN</h1>
-      <p id="report-periode" class="text-xs font-semibold text-slate-600 text-center">Periode: -</p>
-    </div>
-
-    <!-- INFORMASI SISWA & AKADEMIK -->
-    <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-semibold text-slate-800 uppercase border-b border-slate-300 pb-4 max-w-[650px] mx-auto">
-      <div class="space-y-1.5">
-        <div class="flex justify-start"><span class="w-28 shrink-0 text-left">NAMA SISWA/I</span><span>: <strong id="report-siswa-nama">-</strong></span></div>
-        <div class="flex justify-start"><span class="w-28 shrink-0 text-left">NIS/NIPD</span><span>: <span id="report-siswa-nis">-</span></span></div>
-        <div class="flex justify-start"><span class="w-28 shrink-0 text-left">KELAS</span><span>: <span id="report-siswa-kelas">-</span></span></div>
-      </div>
-      <div class="space-y-1.5 pl-4">
-        <div class="flex justify-start"><span class="w-32 shrink-0 text-left">SEMESTER</span><span>: <span id="report-semester">1 (SATU)</span></span></div>
-        <div class="flex justify-start"><span class="w-32 shrink-0 text-left">TAHUN PELAJARAN</span><span>: <span id="report-thn-ajaran">2025/2026</span></span></div>
-        <div class="flex justify-start"><span class="w-32 shrink-0 text-left">GURU TAHFIZH</span><span>: <span id="report-guru-nama">-</span></span></div>
-      </div>
-    </div>
-
-    <!-- A. TABEL ASPEK TAHFIZH (ZIYADAH) BULANAN -->
-    <div>
-      <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">A. Aspek Hafalan Baru (Ziyadah)</h4>
-      <table class="w-full text-xs border-collapse border border-slate-300">
-        <thead>
-          <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
-            <th class="p-2 border border-slate-300 w-[10%]">No</th>
-            <th class="p-2 border border-slate-300 w-[37.5%]">Dari (Awal)</th>
-            <th class="p-2 border border-slate-300 w-[37.5%]">Sampai (Akhir)</th>
-            <th class="p-2 border border-slate-300 w-[15%]">Nilai</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-tahfizh" class="text-center">
-          <tr>
-            <td colspan="4" class="p-4 text-center text-slate-400">Silakan pilih siswa dan bulan untuk menampilkan data.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- B. TABEL ASPEK TAHSIN / IQRO BULANAN -->
-    <div>
-      <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">B. Aspek Capaian Tahsin / Iqro</h4>
-      <table class="w-full text-xs border-collapse border border-slate-300">
-        <thead>
-          <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
-            <th class="p-2 border border-slate-300 w-[10%]">No</th>
-            <th class="p-2 border border-slate-300 w-[37.5%]">Dari (Awal)</th>
-            <th class="p-2 border border-slate-300 w-[37.5%]">Sampai (Akhir)</th>
-            <th class="p-2 border border-slate-300 w-[15%]">Nilai</th>
-          </tr>
-        </thead>
-        <tbody id="tbody-tahsin" class="text-center">
-          <tr>
-            <td colspan="4" class="p-4 text-center text-slate-400">Silakan pilih siswa dan bulan untuk menampilkan data.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- C. TABEL PENILAIAN MURAJA'AH & ADAB (DIBUAT BARU DI BAWAH TAHSIN) -->
-    <div>
-      <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">C. Penilaian Muraja'ah & Adab Bulanan</h4>
-      <table class="w-full text-xs border-collapse border border-slate-300 mb-3">
-        <thead>
-          <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
-            <th class="p-2 border border-slate-300 w-[10%]">No</th>
-            <th class="p-2 border border-slate-300 w-[40%] text-left">Materi Penilaian</th>
-            <th class="p-2 border border-slate-300 w-[20%]">Nilai Rata-rata</th>
-            <th class="p-2 border border-slate-300 w-[30%]">Predikat</th>
-          </tr>
-        </thead>
-        <tbody class="text-center">
-          <tr class="border-b border-slate-200">
-            <td class="p-2 border border-slate-300">1</td>
-            <td class="p-2 border border-slate-300 text-left font-medium">Adab & Kedisiplinan</td>
-            <td id="adab-mutu" class="p-2 border border-slate-300 font-bold">-</td>
-            <td id="adab-predikat" class="p-2 border border-slate-300">-</td>
-          </tr>
-          <tr class="border-b border-slate-200">
-            <td class="p-2 border border-slate-300">2</td>
-            <td class="p-2 border border-slate-300 text-left font-medium">Kelancaran Muraja'ah</td>
-            <td id="murajaah-mutu" class="p-2 border border-slate-300 font-bold">-</td>
-            <td id="murajaah-predikat" class="p-2 border border-slate-300">-</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Ringkasan Target Capaian -->
-      <div class="bg-slate-50 p-2.5 rounded border border-slate-300 text-xs grid grid-cols-3 text-center gap-2">
-        <div>
-          <span class="block text-slate-500 text-[10px] uppercase">Target Capaian:</span>
-          <strong id="target-capaian" class="text-slate-800">-</strong>
+      <!-- LAPORAN PDF -->
+      <section id="page-report" class="page space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Laporan Bulanan Siswa</h2>
+            <p class="text-slate-500 text-xs sm:text-sm">Pilih siswa dan bulan untuk melihat ringkasan perkembangan hafalan.</p>
+          </div>
+          <button onclick="downloadPDF()" class="bg-emerald-600 text-white px-4 sm:px-5 py-2.5 rounded-lg hover:bg-emerald-700 flex items-center gap-2 transition-colors text-xs sm:text-sm self-start sm:self-auto">
+            <i data-lucide="download" class="w-4 h-4"></i> Export ke PDF
+          </button>
         </div>
-        <div>
-          <span class="block text-slate-500 text-[10px] uppercase">Pencapaian Siswa:</span>
-          <strong id="pencapaian-siswa" class="text-slate-800">-</strong>
-        </div>
-        <div>
-          <span class="block text-slate-500 text-[10px] uppercase">Keterangan:</span>
-          <strong id="keterangan-capaian" class="text-emerald-700 font-bold">-</strong>
-        </div>
-      </div>
-    </div>
 
-    <!-- CATATAN & TANDA TANGAN -->
-    <div class="pt-4 border-t border-slate-200 grid grid-cols-2 gap-8 items-start">
-      <div class="text-xs text-center">
-        <p class="font-bold mb-1 text-center">Catatan Guru / Evaluasi:</p>
-        <p id="report-catatan" class="italic text-slate-600 bg-slate-50 p-3 rounded border border-slate-200 text-center">Terus tingkatkan semangat muroja'ah di rumah.</p>
-      </div>
-      <div class="text-center text-xs space-y-10">
-        <p><span id="report-tanggal-cetak"></span><br>Guru Tahfizh</p>
-        <p id="report-ttd-guru" class="font-bold underline text-slate-900 text-center">-</p>
-      </div>
-    </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Filter Kelas</label>
+              <select id="report-filter-kelas" onchange="filterSiswaByKelas('report-filter-kelas', 'report-filter-siswa')" class="select-kelas-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="">-- Semua Kelas --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Siswa (Otomatis)</label>
+              <select id="report-filter-siswa" onchange="updateReportSiswaInfo(); loadReportData();" class="select-siswa-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="" disabled selected>-- Memuat Siswa... --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Bulan & Tahun</label>
+              <input type="month" id="report-filter-bulan" onchange="loadReportData()" class="w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div class="flex items-end">
+              <button onclick="loadReportData()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium h-[38px] rounded-lg transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i data-lucide="filter" class="w-4 h-4"></i> Tampilkan
+              </button>
+            </div>
+          </div>
 
-    </div>
-  </div>
-</section>
+          <div class="border-t pt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Semester (Input Manual)</label>
+              <input type="text" id="manual-input-semester" oninput="updateReportManualInputs()" value="1 (SATU)" placeholder="Contoh: 1 (SATU)" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tahun Pelajaran (Input Manual)</label>
+              <input type="text" id="manual-input-thn-ajaran" oninput="updateReportManualInputs()" value="2025/2026" placeholder="Contoh: 2025/2026" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-amber-800 uppercase mb-1 flex items-center gap-1">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Catatan / Evaluasi Guru (Input Manual)
+              </label>
+              <textarea id="report-input-evaluasi" oninput="updateReportManualInputs()" rows="2" placeholder="Tuliskan evaluasi bulanan di sini..." class="w-full bg-amber-50/50 border border-amber-200 rounded-lg p-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- HASIL PREVIEW TAMPILAN LAPORAN PDF -->
+        <div class="bg-slate-200 p-2 sm:p-4 md:p-8 rounded-xl overflow-x-auto flex justify-center custom-scrollbar">
+          <div id="pdf-content" class="bg-white p-4 sm:p-8 md:p-12 rounded-sm shadow-xl w-full min-w-[600px] max-w-[800px] text-slate-800 space-y-6">
+            
+            <div class="w-full flex justify-center">
+              <img src="kopbisc.PNG" alt="Header Bandung Islamic School" class="w-full h-auto object-contain rounded-sm mx-auto" />
+            </div>
+
+            <div class="text-center space-y-1 my-4 border-b border-slate-200 pb-3">
+              <h2 class="text-lg sm:text-xl font-bold font-serif dir-rtl text-center">كشف الدرجات لتحفيظ القرآن</h2>
+              <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-wide uppercase text-center">LAPORAN BULANAN TAHFIZH DAN TAHSIN AL QURAN</h1>
+              <p id="report-periode" class="text-xs font-semibold text-slate-600 text-center">Periode: -</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-xs font-semibold text-slate-800 uppercase border-b border-slate-300 pb-4 max-w-[650px] mx-auto">
+              <div class="space-y-1.5">
+                <div class="flex justify-start"><span class="w-28 shrink-0 text-left">NAMA SISWA/I</span><span>: <strong id="report-siswa-nama">-</strong></span></div>
+                <div class="flex justify-start"><span class="w-28 shrink-0 text-left">NIS/NIPD</span><span>: <span id="report-siswa-nis">-</span></span></div>
+                <div class="flex justify-start"><span class="w-28 shrink-0 text-left">KELAS</span><span>: <span id="report-siswa-kelas">-</span></span></div>
+              </div>
+              <div class="space-y-1.5 pl-4">
+                <div class="flex justify-start"><span class="w-32 shrink-0 text-left">SEMESTER</span><span>: <span id="report-semester">1 (SATU)</span></span></div>
+                <div class="flex justify-start"><span class="w-32 shrink-0 text-left">TAHUN PELAJARAN</span><span>: <span id="report-thn-ajaran">2025/2026</span></span></div>
+                <div class="flex justify-start"><span class="w-32 shrink-0 text-left">GURU TAHFIZH</span><span>: <span id="report-guru-nama">-</span></span></div>
+              </div>
+            </div>
+
+            <!-- A. TABEL ASPEK TAHFIZH (ZIYADAH) BULANAN -->
+            <div>
+              <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">A. Aspek Hafalan Baru (Ziyadah)</h4>
+              <table class="w-full text-xs border-collapse border border-slate-300">
+                <thead>
+                  <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
+                    <th class="p-2 border border-slate-300 w-[10%]">No</th>
+                    <th class="p-2 border border-slate-300 w-[37.5%]">Dari (Awal)</th>
+                    <th class="p-2 border border-slate-300 w-[37.5%]">Sampai (Akhir)</th>
+                    <th class="p-2 border border-slate-300 w-[15%]">Nilai</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-tahfizh" class="text-center">
+                  <tr>
+                    <td colspan="4" class="p-4 text-center text-slate-400">Silakan pilih siswa dan bulan untuk menampilkan data.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- B. TABEL ASPEK TAHSIN / IQRO BULANAN -->
+            <div>
+              <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">B. Aspek Capaian Tahsin / Iqro</h4>
+              <table class="w-full text-xs border-collapse border border-slate-300">
+                <thead>
+                  <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
+                    <th class="p-2 border border-slate-300 w-[10%]">No</th>
+                    <th class="p-2 border border-slate-300 w-[37.5%]">Dari (Awal)</th>
+                    <th class="p-2 border border-slate-300 w-[37.5%]">Sampai (Akhir)</th>
+                    <th class="p-2 border border-slate-300 w-[15%]">Nilai</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-tahsin" class="text-center">
+                  <tr>
+                    <td colspan="4" class="p-4 text-center text-slate-400">Silakan pilih siswa dan bulan untuk menampilkan data.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- C. TABEL PENILAIAN MURAJA'AH & ADAB -->
+            <div>
+              <h4 class="font-bold text-xs mb-2 text-slate-700 uppercase text-center">C. Penilaian Muraja'ah & Adab Bulanan</h4>
+              <table class="w-full text-xs border-collapse border border-slate-300 mb-3">
+                <thead>
+                  <tr class="bg-slate-100 border-b border-slate-300 text-center font-bold">
+                    <th class="p-2 border border-slate-300 w-[10%]">No</th>
+                    <th class="p-2 border border-slate-300 w-[40%] text-left">Materi Penilaian</th>
+                    <th class="p-2 border border-slate-300 w-[20%]">Nilai Rata-rata</th>
+                    <th class="p-2 border border-slate-300 w-[30%]">Predikat</th>
+                  </tr>
+                </thead>
+                <tbody class="text-center">
+                  <tr class="border-b border-slate-200">
+                    <td class="p-2 border border-slate-300">1</td>
+                    <td class="p-2 border border-slate-300 text-left font-medium">Adab & Kedisiplinan</td>
+                    <td id="adab-mutu" class="p-2 border border-slate-300 font-bold">-</td>
+                    <td id="adab-predikat" class="p-2 border border-slate-300">-</td>
+                  </tr>
+                  <tr class="border-b border-slate-200">
+                    <td class="p-2 border border-slate-300">2</td>
+                    <td class="p-2 border border-slate-300 text-left font-medium">Kelancaran Muraja'ah</td>
+                    <td id="murajaah-mutu" class="p-2 border border-slate-300 font-bold">-</td>
+                    <td id="murajaah-predikat" class="p-2 border border-slate-300">-</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="bg-slate-50 p-2.5 rounded border border-slate-300 text-xs grid grid-cols-1 sm:grid-cols-3 text-center gap-2">
+                <div>
+                  <span class="block text-slate-500 text-[10px] uppercase">Target Capaian:</span>
+                  <strong id="target-capaian" class="text-slate-800">-</strong>
+                </div>
+                <div>
+                  <span class="block text-slate-500 text-[10px] uppercase">Pencapaian Siswa:</span>
+                  <strong id="pencapaian-siswa" class="text-slate-800">-</strong>
+                </div>
+                <div>
+                  <span class="block text-slate-500 text-[10px] uppercase">Keterangan:</span>
+                  <strong id="keterangan-capaian" class="text-emerald-700 font-bold">-</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- CATATAN & TANDA TANGAN -->
+            <div class="pt-4 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
+              <div class="text-xs text-center sm:text-left">
+                <p class="font-bold mb-1 text-center sm:text-left">Catatan Guru / Evaluasi:</p>
+                <p id="report-catatan" class="italic text-slate-600 bg-slate-50 p-3 rounded border border-slate-200 text-center sm:text-left">Terus tingkatkan semangat muroja'ah di rumah.</p>
+              </div>
+              <div class="text-center text-xs space-y-10">
+                <p><span id="report-tanggal-cetak"></span><br>Guru Tahfizh</p>
+                <p id="report-ttd-guru" class="font-bold underline text-slate-900 text-center">-</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -1542,12 +1749,30 @@ async function loadTargetWABySiswa() {
       }
     }
 
-    function switchPage(pageId) {
-      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-      const targetPage = document.getElementById(`page-${pageId}`);
-      if (targetPage) targetPage.classList.add('active');
-    }
+function switchPage(pageId) {
+  // 1. Sembunyikan semua halaman & tampilkan halaman terpilih
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  const targetPage = document.getElementById('page-' + pageId);
+  if (targetPage) targetPage.classList.add('active');
 
+  // 2. Update status aktif pada tombol navigasi
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.querySelector(`.nav-btn[onclick="switchPage('${pageId}')"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // 3. Update Sub-judul di Top Bar HP
+  const titleMap = {
+    'dashboard': 'Dashboard',
+    'master-data': 'Master Data Siswa',
+    'input-data': 'Input Setoran Harian',
+    'whatsapp-plan': 'Rencana Pesan WA',
+    'report': 'Laporan PDF'
+  };
+  const mobileTitle = document.getElementById('mobile-page-title');
+  if (mobileTitle && titleMap[pageId]) {
+    mobileTitle.innerText = titleMap[pageId];
+  }
+}
     async function handleMasterSubmit(e, dataName) {
       e.preventDefault();
       const form = e.target;
