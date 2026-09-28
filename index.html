@@ -270,6 +270,36 @@
       }
     }
   }
+
+  /* ==========================================
+   KHUSUS ROLE ORANG TUA (HIDE NAV & TOP BAR)
+   ========================================== */
+@media (max-width: 767px) {
+  /* Sembunyikan Bottom Nav (Aside) & Top Bar jika body memiliki class user-ortu */
+  body.user-ortu #app-layout > aside
+
+
+  /* Reset spacing padding pada main area agar layout penuh tanpa whitespace kosong */
+  body.user-ortu #app-layout > main {
+    padding-top: 16px !important;
+    padding-bottom: 24px !important;
+  }
+}
+
+/* Jika menggunakan Safe Area iOS untuk Orang Tua */
+@supports (padding: max(0px)) {
+  @media (max-width: 767px) {
+    body.user-ortu #app-layout > main {
+      padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+  
+
+  /* Di file CSS kamu */
+body.user-ortu aside {
+  display: none !important;
+}
 </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen">
@@ -335,50 +365,50 @@
   </header>
 
   <!-- SIDEBAR (DESKTOP) / BOTTOM BAR (MOBILE) -->
-  <aside class="bg-slate-900 md:bg-slate-900 text-slate-300 flex-shrink-0">
-    <!-- Header Sidebar Desktop -->
-    <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <i data-lucide="book-open" class="text-emerald-400 w-6 h-6"></i>
-        <span class="font-bold text-white text-base sm:text-lg">TahfizhApp</span>
-      </div>
-      <span id="user-badge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-medium">GURU</span>
+<!-- SIDEBAR (DESKTOP) / BOTTOM BAR (MOBILE) -->
+<aside id="app-sidebar" class="bg-slate-900 md:bg-slate-900 text-slate-300 flex-shrink-0">
+  <!-- Header Sidebar Desktop -->
+  <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <i data-lucide="book-open" class="text-emerald-400 w-6 h-6"></i>
+      <span class="font-bold text-white text-base sm:text-lg">TahfizhApp</span>
     </div>
+    <span id="user-badge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-medium">GURU</span>
+  </div>
 
-    <!-- Navigasi Menu -->
-    <nav class="p-3 sm:p-4 flex md:flex-col custom-scrollbar">
-      <button onclick="switchPage('dashboard')" class="nav-btn active flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
-        <i data-lucide="layout-dashboard" class="shrink-0"></i>
-        <span>Home</span>
-      </button>
-      
-      <button id="nav-master-data" onclick="switchPage('master-data')" class="nav-btn hidden flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
-        <i data-lucide="database" class="shrink-0"></i>
-        <span>Siswa</span>
-      </button>
+  <!-- Navigasi Menu -->
+  <nav class="p-3 sm:p-4 flex md:flex-col custom-scrollbar">
+    <button onclick="switchPage('dashboard')" class="nav-btn active flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+      <i data-lucide="layout-dashboard" class="shrink-0"></i>
+      <span>Home</span>
+    </button>
+    
+    <button id="nav-master-data" onclick="switchPage('master-data')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+      <i data-lucide="database" class="shrink-0"></i>
+      <span>Siswa</span>
+    </button>
 
-      <button onclick="switchPage('input-data')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
-        <i data-lucide="edit-3" class="shrink-0"></i>
-        <span>Setoran</span>
-      </button>
+    <button onclick="switchPage('input-data')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+      <i data-lucide="edit-3" class="shrink-0"></i>
+      <span>Setoran</span>
+    </button>
 
-      <button onclick="switchPage('whatsapp-plan')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
-        <i data-lucide="send" class="shrink-0"></i>
-        <span>Pesan WA</span>
-      </button>
+    <button onclick="switchPage('whatsapp-plan')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+      <i data-lucide="send" class="shrink-0"></i>
+      <span>Pesan WA</span>
+    </button>
 
-      <button onclick="switchPage('report')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
-        <i data-lucide="file-text" class="shrink-0"></i>
-        <span>Laporan</span>
-      </button>
+    <button onclick="switchPage('report')" class="nav-btn flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg hover:bg-slate-800 transition-colors">
+      <i data-lucide="file-text" class="shrink-0"></i>
+      <span>Laporan</span>
+    </button>
 
-      <!-- Tombol Keluar (Hanya Tampil di Desktop Sidebar) -->
-      <button onclick="handleLogout()" class="hidden md:flex items-center gap-3 px-4 py-3 text-sm rounded-lg hover:bg-rose-900/40 text-rose-400 transition-colors md:mt-auto">
-        <i data-lucide="log-out" class="shrink-0"></i>
-        <span>Keluar</span>
-      </button>
-    </nav>
-  </aside>
+    <button onclick="handleLogout()" class="hidden md:flex items-center gap-3 px-4 py-3 text-sm rounded-lg hover:bg-rose-900/40 text-rose-400 transition-colors md:mt-auto">
+      <i data-lucide="log-out" class="shrink-0"></i>
+      <span>Keluar</span>
+    </button>
+  </nav>
+</aside>
 
     <main class="flex-1 p-3 sm:p-6 md:p-8 overflow-y-auto">
       
@@ -1691,7 +1721,7 @@ async function handleLogin(e) {
     // Manajemen Navigasi Menu
     const masterNav = document.getElementById('nav-master-data');
     const allNavButtons = document.querySelectorAll('aside nav button');
-
+    updateLayoutByRole(currentUser.role);
     if (role === 'orangtua') {
       // Sembunyikan semua menu default (Guru/Admin)
       allNavButtons.forEach(btn => btn.classList.add('hidden'));
@@ -3946,8 +3976,16 @@ function formatDateToShort(dateString) {
   return `${day}/${month}/${year}`;
 }
 
+function updateLayoutByRole(role) {
+  if (role === 'orangtua') {
+    document.body.classList.add('user-ortu');
+  } else {
+    document.body.classList.remove('user-ortu');
+  }
+}
 
-
+// Panggil fungsi di atas saat pengguna selesai login / memuat halaman:
+// Contoh: updateLayoutByRole(currentUser.role);
   </script>
 </body>
 </html>
