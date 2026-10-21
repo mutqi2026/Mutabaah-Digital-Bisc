@@ -300,15 +300,69 @@
 body.user-ortu aside {
   display: none !important;
 }
+
+  /* ===== TEMA BIRU ELEGAN & PROFESIONAL ===== */
+  :root {
+    --brand-blue: #1d4ed8;
+    --brand-deep: #102a56;
+    --brand-light: #eff6ff;
+  }
+  body { background-color: #f4f7fc; color: #172b4d; }
+  #page-login {
+    background-image: radial-gradient(circle at 15% 15%, rgba(96,165,250,.30), transparent 32%),
+      linear-gradient(135deg, #102a56 0%, #1d4ed8 55%, #2563eb 100%) !important;
+  }
+  #app-sidebar {
+    background: linear-gradient(180deg, #10213f 0%, #142f59 100%) !important;
+    border-right: 1px solid rgba(147,197,253,.18);
+  }
+  #app-sidebar .nav-btn { transition: background-color .2s ease, color .2s ease, transform .2s ease; }
+  #app-sidebar .nav-btn:hover { background-color: rgba(96,165,250,.14) !important; color: #fff !important; }
+  #app-sidebar .nav-btn.active {
+    background: linear-gradient(90deg, rgba(59,130,246,.28), rgba(59,130,246,.08)) !important;
+    color: #bfdbfe !important;
+    box-shadow: inset 3px 0 0 #60a5fa;
+  }
+  #mobile-top-bar {
+    background: rgba(255,255,255,.97) !important;
+    border-bottom-color: #dbeafe !important;
+    box-shadow: 0 4px 16px rgba(30,64,175,.06);
+  }
+  .bg-white.rounded-xl, .bg-white.rounded-2xl {
+    border-color: #e0e8f4 !important;
+    box-shadow: 0 5px 18px rgba(15, 40, 85, .045);
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.13) !important;
+    outline: none;
+  }
+  button { transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  button.bg-blue-600, button.bg-indigo-600 {
+    box-shadow: 0 3px 8px rgba(37,99,235,.16);
+  }
+  button.bg-blue-600:hover, button.bg-indigo-600:hover {
+    box-shadow: 0 5px 12px rgba(37,99,235,.22);
+  }
+  .autocomplete-item:hover { background-color: #eff6ff !important; color: #1d4ed8 !important; }
+  @media (max-width: 767px) {
+    #app-layout > aside {
+      background: rgba(255,255,255,.98) !important;
+      border-top-color: #dbeafe !important;
+      box-shadow: 0 -5px 18px rgba(15,40,85,.08) !important;
+    }
+    .nav-btn.active { color: #1d4ed8 !important; }
+  }
+
 </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased min-h-screen">
 
   <!-- LOG IN PAGE -->
-  <div id="page-login" class="page active min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-emerald-600 to-teal-800">
+  <div id="page-login" class="page active min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-600 to-indigo-800">
     <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md">
       <div class="text-center mb-6 sm:mb-8">
-        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
           <i data-lucide="book-open" class="w-7 h-7 sm:w-8 sm:h-8"></i>
         </div>
         <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Mutabaah Tahfizh</h1>
@@ -318,7 +372,7 @@ body.user-ortu aside {
       <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Peran Akses</label>
- <select id="login-role" class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none">
+ <select id="login-role" class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
   <option value="guru">Guru Tahfizh</option>
   <option value="admin">Administrator / Koordinator Tahfizh</option>
   <option value="orangtua">Orang Tua / Wali Siswa</option>
@@ -326,13 +380,13 @@ body.user-ortu aside {
         </div>
         <div>
           <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Username / NIP</label>
-          <input type="text" id="login-username" required class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin / guru">
+          <input type="text" id="login-username" required class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Default: admin / guru">
         </div>
         <div>
           <label class="block text-xs sm:text-sm font-medium text-slate-700 mb-1">Kata Sandi</label>
-          <input type="password" id="login-password" required class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Default: admin123 / guru123">
+          <input type="password" id="login-password" required class="w-full px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Default: admin123 / guru123">
         </div>
-        <button type="submit" id="btn-login-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 sm:py-3 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2 text-xs sm:text-sm">
+        <button type="submit" id="btn-login-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 sm:py-3 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2 text-xs sm:text-sm">
           Masuk ke Dashboard
         </button>
       </form>
@@ -349,13 +403,13 @@ body.user-ortu aside {
         <i data-lucide="menu" class="w-6 h-6"></i>
       </button>
       <div>
-        <h1 class="font-bold text-emerald-700 text-base leading-tight">TahfizhApp</h1>
+        <h1 class="font-bold text-blue-700 text-base leading-tight">TahfizhApp</h1>
         <p id="mobile-page-title" class="text-xs text-slate-500">Dashboard</p>
       </div>
     </div>
     
     <div class="flex items-center gap-2">
-      <span id="user-badge-mobile" class="bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2.5 py-1 rounded-full">
+      <span id="user-badge-mobile" class="bg-blue-100 text-blue-700 text-[11px] font-semibold px-2.5 py-1 rounded-full">
         Guru
       </span>
       <button onclick="handleLogout()" class="text-slate-500 hover:text-rose-600 p-1">
@@ -370,10 +424,10 @@ body.user-ortu aside {
   <!-- Header Sidebar Desktop -->
   <div class="p-4 sm:p-6 border-b border-slate-800 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <i data-lucide="book-open" class="text-emerald-400 w-6 h-6"></i>
+      <i data-lucide="book-open" class="text-blue-400 w-6 h-6"></i>
       <span class="font-bold text-white text-base sm:text-lg">TahfizhApp</span>
     </div>
-    <span id="user-badge" class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-1 rounded font-medium">GURU</span>
+    <span id="user-badge" class="bg-blue-500/10 text-blue-400 text-xs px-2 py-1 rounded font-medium">GURU</span>
   </div>
 
   <!-- Navigasi Menu -->
@@ -415,25 +469,25 @@ body.user-ortu aside {
       <!-- DASHBOARD ORANG TUA (EKSLUSIF & PROFESIONAL) -->
 <section id="page-dashboard-ortu" class="page space-y-6">
   <!-- Header & Ucapan Selamat Datang -->
-  <div class="bg-gradient-to-r from-emerald-700 to-teal-800 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
-      <span class="bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">
+      <span class="bg-blue-500/20 text-blue-200 border border-blue-400/30 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">
         Portal Orang Tua / Wali
       </span>
       <h2 id="ortu-welcome-title" class="text-xl sm:text-3xl font-bold mt-2">Selamat Datang, Wali Ananda</h2>
-      <p id="ortu-welcome-sub" class="text-emerald-100 text-xs sm:text-sm mt-1">Pantau perkembangan hafalan, muraja'ah, dan adab ananda secara rinci dan real-time.</p>
+      <p id="ortu-welcome-sub" class="text-blue-100 text-xs sm:text-sm mt-1">Pantau perkembangan hafalan, muraja'ah, dan adab ananda secara rinci dan real-time.</p>
     </div>
     <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center shrink-0 w-full md:w-auto">
-      <span class="text-xs text-emerald-200 block">Siswa Yang Dipantau:</span>
+      <span class="text-xs text-blue-200 block">Siswa Yang Dipantau:</span>
       <strong id="ortu-nama-anak" class="text-lg font-bold text-white block">-</strong>
-      <span id="ortu-kelas-anak" class="text-xs text-emerald-300 block">Kelas: -</span>
+      <span id="ortu-kelas-anak" class="text-xs text-blue-300 block">Kelas: -</span>
     </div>
   </div>
 
 <!-- Filter Rentang Bulan & Tahun -->
 <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
   <div class="flex items-center gap-2">
-    <i data-lucide="filter" class="w-4 h-4 text-emerald-600"></i>
+    <i data-lucide="filter" class="w-4 h-4 text-blue-600"></i>
     <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Filter Periode Capaian:</span>
   </div>
 
@@ -441,7 +495,7 @@ body.user-ortu aside {
     <!-- Dari Bulan -->
     <div class="flex items-center gap-1">
       <span class="text-slate-500">Dari:</span>
-      <select id="ortu-bulan-dari" onchange="calculateOrtuStats()" class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500 font-semibold cursor-pointer">
+      <select id="ortu-bulan-dari" onchange="calculateOrtuStats()" class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
         <option value="0">Januari</option>
         <option value="1">Februari</option>
         <option value="2">Maret</option>
@@ -460,7 +514,7 @@ body.user-ortu aside {
     <!-- Sampai Bulan -->
     <div class="flex items-center gap-1">
       <span class="text-slate-500">s/d:</span>
-      <select id="ortu-bulan-sampai" onchange="calculateOrtuStats()" class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500 font-semibold cursor-pointer">
+      <select id="ortu-bulan-sampai" onchange="calculateOrtuStats()" class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
         <option value="0">Januari</option>
         <option value="1">Februari</option>
         <option value="2">Maret</option>
@@ -479,7 +533,7 @@ body.user-ortu aside {
     <!-- Tahun -->
     <div class="flex items-center gap-1">
       <span class="text-slate-500">Tahun:</span>
-      <select id="ortu-tahun-filter" onchange="calculateOrtuStats()" class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500 font-semibold cursor-pointer">
+      <select id="ortu-tahun-filter" onchange="calculateOrtuStats()" class="bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
         <option value="2026" selected>2026</option>
         <option value="2027">2027</option>
         <option value="2028">2028</option>
@@ -495,7 +549,7 @@ body.user-ortu aside {
   <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
     <div class="flex items-center justify-between">
       <span class="text-xs font-bold text-slate-600">ZIYADAH</span>
-      <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="book-open" class="w-4 h-4"></i></div>
+      <div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="book-open" class="w-4 h-4"></i></div>
     </div>
     <div class="text-[11px] space-y-1">
       <p class="text-slate-500">Awal: <strong id="ortu-first-ziyadah" class="text-slate-800 font-semibold">-</strong></p>
@@ -503,7 +557,7 @@ body.user-ortu aside {
     </div>
     <div class="pt-2 border-t border-slate-100 flex justify-between items-center">
       <span class="text-[11px] text-slate-500 font-medium">Rata-rata Nilai</span>
-      <span id="ortu-avg-ziyadah" class="text-sm font-extrabold text-emerald-600">-</span>
+      <span id="ortu-avg-ziyadah" class="text-sm font-extrabold text-blue-600">-</span>
     </div>
   </div>
 
@@ -527,7 +581,7 @@ body.user-ortu aside {
   <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
     <div class="flex items-center justify-between">
       <span class="text-xs font-bold text-slate-600">MURAJA'AH</span>
-      <div class="p-2 bg-teal-100 text-teal-600 rounded-lg"><i data-lucide="refresh-cw" class="w-4 h-4"></i></div>
+      <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><i data-lucide="refresh-cw" class="w-4 h-4"></i></div>
     </div>
     <div class="text-[11px] space-y-1">
       <p class="text-slate-500">Awal: <strong id="ortu-first-murajaah" class="text-slate-800 font-semibold">-</strong></p>
@@ -535,7 +589,7 @@ body.user-ortu aside {
     </div>
     <div class="pt-2 border-t border-slate-100 flex justify-between items-center">
       <span class="text-[11px] text-slate-500 font-medium">Rata-rata Nilai</span>
-      <span id="ortu-avg-murajaah" class="text-sm font-extrabold text-teal-600">-</span>
+      <span id="ortu-avg-murajaah" class="text-sm font-extrabold text-indigo-600">-</span>
     </div>
   </div>
 
@@ -559,12 +613,12 @@ body.user-ortu aside {
   <!-- Target Besok & Riwayat Terakhir -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Target Pembelajaran Besok -->
-    <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl space-y-3">
-      <div class="flex items-center gap-2 border-b border-emerald-200 pb-3">
-        <i data-lucide="target" class="w-5 h-5 text-emerald-700"></i>
-        <h3 class="font-bold text-emerald-900 text-sm sm:text-base">Target Pembelajaran Selanjutnya</h3>
+    <div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl space-y-3">
+      <div class="flex items-center gap-2 border-b border-blue-200 pb-3">
+        <i data-lucide="target" class="w-5 h-5 text-blue-700"></i>
+        <h3 class="font-bold text-blue-900 text-sm sm:text-base">Target Pembelajaran Selanjutnya</h3>
       </div>
-      <div id="ortu-target-container" class="space-y-2 text-xs sm:text-sm text-emerald-950">
+      <div id="ortu-target-container" class="space-y-2 text-xs sm:text-sm text-blue-950">
         <p class="text-slate-500 italic">Memuat target pembelajaran...</p>
       </div>
     </div>
@@ -573,13 +627,13 @@ body.user-ortu aside {
 <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b pb-3">
     <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
-      <i data-lucide="history" class="w-5 h-5 text-emerald-600"></i> Riwayat Setoran Ananda
+      <i data-lucide="history" class="w-5 h-5 text-blue-600"></i> Riwayat Setoran Ananda
     </h3>
     
     <!-- Filter Waktu Bertingkat (Bulan, Pekan Ke-, Tahun) -->
     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
       <!-- Filter Bulan -->
-      <select id="ortu-filter-bulan" onchange="updatePekanOptions()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500 font-semibold cursor-pointer">
+      <select id="ortu-filter-bulan" onchange="updatePekanOptions()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
         <option value="semua">-- Semua Bulan --</option>
         <option value="0">Januari</option>
         <option value="1">Februari</option>
@@ -596,7 +650,7 @@ body.user-ortu aside {
       </select>
 
       <!-- Filter Pekan Ke- -->
-      <select id="ortu-filter-pekan" onchange="filterRiwayatOrtu()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500 font-semibold cursor-pointer">
+      <select id="ortu-filter-pekan" onchange="filterRiwayatOrtu()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
         <option value="semua">-- Semua Pekan --</option>
         <option value="1">Pekan 1 </option>
         <option value="2">Pekan 2 </option>
@@ -606,7 +660,7 @@ body.user-ortu aside {
       </select>
 
       <!-- Filter Tahun -->
-      <select id="ortu-filter-tahun" onchange="updatePekanOptions()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500 font-semibold cursor-pointer">
+      <select id="ortu-filter-tahun" onchange="updatePekanOptions()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
         <option value="2026" selected>2026</option>
         <option value="2027">2027</option>
         <option value="2028">2028</option>
@@ -648,20 +702,20 @@ body.user-ortu aside {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-            <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="users"></i></div>
+            <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="users"></i></div>
             <div><p class="text-xs text-slate-500">Total Siswa</p><p id="stat-total-siswa" class="text-lg sm:text-xl font-bold">0 Siswa</p></div>
           </div>
           <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-            <div class="p-3 bg-teal-100 text-teal-600 rounded-lg"><i data-lucide="award"></i></div>
+            <div class="p-3 bg-indigo-100 text-indigo-600 rounded-lg"><i data-lucide="award"></i></div>
             <div><p class="text-xs text-slate-500">Rata-rata Capaian</p><p id="stat-rata-capaian" class="text-lg sm:text-xl font-bold">Baik</p></div>
           </div>
           <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div class="p-3 bg-amber-100 text-amber-600 rounded-lg"><i data-lucide="clock"></i></div>
-            <div><p class="text-xs text-slate-500">Status Muraja'ah</p><p id="stat-murajaah" class="text-lg sm:text-xl font-bold text-emerald-600">Aktif</p></div>
+            <div><p class="text-xs text-slate-500">Status Muraja'ah</p><p id="stat-murajaah" class="text-lg sm:text-xl font-bold text-blue-600">Aktif</p></div>
           </div>
           <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="calendar"></i></div>
-            <div><p class="text-xs text-slate-500">Sistem</p><p class="text-lg sm:text-xl font-bold text-emerald-600">Terhubung</p></div>
+            <div><p class="text-xs text-slate-500">Sistem</p><p class="text-lg sm:text-xl font-bold text-blue-600">Terhubung</p></div>
           </div>
         </div>
       </section>
@@ -676,94 +730,94 @@ body.user-ortu aside {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
             <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="user-plus" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Siswa Baru
+              <i data-lucide="user-plus" class="text-blue-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Siswa Baru
             </h3>
             <form onsubmit="handleMasterSubmit(event, 'Siswa')" class="space-y-3 text-xs sm:text-sm">
               <div>
                 <label class="block font-medium mb-1">Nama Lengkap Siswa</label>
-                <input type="text" id="master-siswa-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Masukkan nama siswa">
+                <input type="text" id="master-siswa-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama siswa">
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label class="block font-medium mb-1">NIS / NISN</label>
-                  <input type="text" id="master-siswa-nis" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="123456">
+                  <input type="text" id="master-siswa-nis" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="123456">
                 </div>
                 <div>
                   <label class="block font-medium mb-1">Kelas / Halqah</label>
-                  <select id="master-siswa-kelas" required class="select-kelas-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                  <select id="master-siswa-kelas" required class="select-kelas-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                     <option value="" disabled selected>-- Pilih Kelas --</option>
                   </select>
                 </div>
               </div>
               <div>
                 <label class="block font-medium mb-1">Nomor WhatsApp Orang Tua</label>
-                <input type="text" id="master-siswa-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="628123456789">
+                <input type="text" id="master-siswa-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="628123456789">
               </div>
-              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Siswa</button>
+              <button type="submit" class="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors">Simpan Siswa</button>
             </form>
           </div>
 
           <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
             <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="user-check" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Guru / Ustaz
+              <i data-lucide="user-check" class="text-blue-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Guru / Ustaz
             </h3>
             <form onsubmit="handleMasterSubmit(event, 'Guru')" class="space-y-3 text-xs sm:text-sm">
               <div>
                 <label class="block font-medium mb-1">Nama Lengkap Guru</label>
-                <input type="text" id="master-guru-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="Ust. Fulan, S.Pd">
+                <input type="text" id="master-guru-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ust. Fulan, S.Pd">
               </div>
               <div>
                 <label class="block font-medium mb-1">NIP / ID Guru</label>
-                <input type="text" id="master-guru-nip" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="GURU-001">
+                <input type="text" id="master-guru-nip" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="GURU-001">
               </div>
               <div>
                 <label class="block font-medium mb-1">No. WhatsApp</label>
-                <input type="text" id="master-guru-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="628123456789">
+                <input type="text" id="master-guru-wa" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="628123456789">
               </div>
-              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Guru</button>
+              <button type="submit" class="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors">Simpan Guru</button>
             </form>
           </div>
 
           <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
             <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="school" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Kelas / Halqah Baru
+              <i data-lucide="school" class="text-blue-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Kelas / Halqah Baru
             </h3>
             <form onsubmit="handleMasterSubmit(event, 'Kelas')" class="space-y-3 text-xs sm:text-sm">
               <div>
                 <label class="block font-medium mb-1">Nama Kelas / Halqah</label>
-                <input type="text" id="master-kelas-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="contoh: 8A - Mus'ab bin 'Umair">
+                <input type="text" id="master-kelas-nama" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="contoh: 8A - Mus'ab bin 'Umair">
               </div>
               <div>
                 <label class="block font-medium mb-1">Guru Pembimbing / Musyrif</label>
-                <select id="master-kelas-guru" required class="select-guru-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                <select id="master-kelas-guru" required class="select-guru-list w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                   <option value="" disabled selected>-- Pilih Guru --</option>
                 </select>
               </div>
-              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Kelas</button>
+              <button type="submit" class="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors">Simpan Kelas</button>
             </form>
           </div>
 
           <div class="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
             <h3 class="font-bold text-slate-800 text-sm sm:text-base border-b pb-2 mb-4 flex items-center gap-2">
-              <i data-lucide="shield-check" class="text-emerald-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Akun User Pengguna
+              <i data-lucide="shield-check" class="text-blue-600 w-4 h-4 sm:w-5 sm:h-5"></i> Tambah Akun User Pengguna
             </h3>
             <form onsubmit="handleMasterSubmit(event, 'User')" class="space-y-3 text-xs sm:text-sm">
               <div>
                 <label class="block font-medium mb-1">Username Pengguna</label>
-                <input type="text" id="master-user-name" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="username_login">
+                <input type="text" id="master-user-name" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="username_login">
               </div>
               <div>
                 <label class="block font-medium mb-1">Kata Sandi (Password)</label>
-                <input type="password" id="master-user-pass" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500" placeholder="••••••••">
+                <input type="password" id="master-user-pass" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
               </div>
               <div>
                 <label class="block font-medium mb-1">Peran Akses (Role)</label>
-                <select id="master-user-role" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                <select id="master-user-role" required class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                   <option value="guru">Guru Tahfizh</option>
                   <option value="admin">Administrator / Koordinator Tahfizh</option>
                 </select>
               </div>
-              <button type="submit" class="w-full bg-emerald-600 text-white font-medium py-2 rounded-lg hover:bg-emerald-700 transition-colors">Simpan Akun User</button>
+              <button type="submit" class="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors">Simpan Akun User</button>
             </form>
           </div>
         </div>
@@ -782,14 +836,14 @@ body.user-ortu aside {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Target Besok</label>
-                <input type="date" id="wa-tanggal-target" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                <input type="date" id="wa-tanggal-target" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
               </div>
 
               <div>
                 <label class="block text-xs font-medium mb-1 text-slate-600">Tanggal Laporan</label>
                 <div class="flex items-center">
-                  <input type="date" id="wa-tanggal-laporan" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-l-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 border-r-0">
-                  <button type="button" onclick="muatDataLaporanHarian()" title="Cari Data Laporan" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-r-lg text-xs font-medium transition-colors flex items-center justify-center shrink-0 shadow-sm gap-1">
+                  <input type="date" id="wa-tanggal-laporan" onchange="generateWaText()" class="w-full px-2.5 py-2 border border-slate-300 rounded-l-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 border-r-0">
+                  <button type="button" onclick="muatDataLaporanHarian()" title="Cari Data Laporan" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r-lg text-xs font-medium transition-colors flex items-center justify-center shrink-0 shadow-sm gap-1">
                     <i data-lucide="search" class="w-3.5 h-3.5"></i>
                     <span>Cari</span>
                   </button>
@@ -798,19 +852,19 @@ body.user-ortu aside {
 
               <div>
                 <label class="block text-xs font-medium mb-1 text-slate-600">Filter Kelas</label>
-                <select id="wa-filter-kelas" onchange="filterSiswaByKelas('wa-filter-kelas', 'wa-siswa')" class="select-kelas-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                <select id="wa-filter-kelas" onchange="filterSiswaByKelas('wa-filter-kelas', 'wa-siswa')" class="select-kelas-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                   <option value="">-- Semua --</option>
                 </select>
               </div>
 
               <div>
                 <label class="block text-xs font-medium mb-1 text-slate-600">No. WA Ortu</label>
-                <input type="text" id="wa-nomor" placeholder="628xxx" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                <input type="text" id="wa-nomor" placeholder="628xxx" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
               </div>
 
               <div class="sm:col-span-2">
                 <label class="block text-xs font-medium mb-1 text-slate-600">Pilih Siswa</label>
-                <select id="wa-siswa" onchange="loadTargetWABySiswa()" class="select-siswa-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                <select id="wa-siswa" onchange="loadTargetWABySiswa()" class="select-siswa-list w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                   <option value="" disabled selected>-- Memuat... --</option>
                 </select>
               </div>
@@ -818,14 +872,14 @@ body.user-ortu aside {
 
             <!-- Target 1: Ziyadah -->
             <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-              <span class="text-xs font-bold text-emerald-800 block">1. Target Ziyadah Besok (Hafalan Baru)</span>
+              <span class="text-xs font-bold text-blue-800 block">1. Target Ziyadah Besok (Hafalan Baru)</span>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div class="relative">
-                  <input type="text" id="wa-ziyadah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <input type="text" id="wa-ziyadah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <div id="wa-ziyadah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
                 </div>
                 <div class="relative">
-                  <input type="text" id="wa-ziyadah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <input type="text" id="wa-ziyadah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-ziyadah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <div id="wa-ziyadah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
                 </div>
               </div>
@@ -833,14 +887,14 @@ body.user-ortu aside {
 
             <!-- Target 2: Tahsin -->
             <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-              <span class="text-xs font-bold text-emerald-800 block">2. Target Tahsin / Iqro Besok</span>
+              <span class="text-xs font-bold text-blue-800 block">2. Target Tahsin / Iqro Besok</span>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div class="relative">
-                  <input type="text" id="wa-tahsin-dari" autocomplete="off" placeholder="Dari Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <input type="text" id="wa-tahsin-dari" autocomplete="off" placeholder="Dari Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <div id="wa-tahsin-dari-dropdown" class="autocomplete-dropdown hidden"></div>
                 </div>
                 <div class="relative">
-                  <input type="text" id="wa-tahsin-sampai" autocomplete="off" placeholder="Sampai Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <input type="text" id="wa-tahsin-sampai" autocomplete="off" placeholder="Sampai Iqro / Surat..." oninput="handleCombinedFilter(this, 'wa-tahsin-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <div id="wa-tahsin-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
                 </div>
               </div>
@@ -848,14 +902,14 @@ body.user-ortu aside {
 
             <!-- Target 3: Murajaah -->
             <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
-              <span class="text-xs font-bold text-emerald-800 block">3. Target Murajaah Besok (Pengulangan)</span>
+              <span class="text-xs font-bold text-blue-800 block">3. Target Murajaah Besok (Pengulangan)</span>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div class="relative">
-                  <input type="text" id="wa-murajaah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <input type="text" id="wa-murajaah-dari" autocomplete="off" placeholder="Dari Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-dari-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <div id="wa-murajaah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
                 </div>
                 <div class="relative">
-                  <input type="text" id="wa-murajaah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                  <input type="text" id="wa-murajaah-sampai" autocomplete="off" placeholder="Sampai Surat : Ayat..." oninput="handleQuranFilter(this, 'wa-murajaah-sampai-dropdown'); generateWaText()" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <div id="wa-murajaah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
                 </div>
               </div>
@@ -863,7 +917,7 @@ body.user-ortu aside {
 
             <div>
               <label class="block text-xs font-medium mb-1 text-slate-600">Catatan Tambahan Pembimbing</label>
-              <textarea id="wa-catatan" oninput="generateWaText()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500" rows="2" placeholder="Tuliskan pesan khusus untuk orang tua..."></textarea>
+              <textarea id="wa-catatan" oninput="generateWaText()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Tuliskan pesan khusus untuk orang tua..."></textarea>
             </div>
 
             <button onclick="saveRencanaWA()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-xs md:text-sm">
@@ -875,12 +929,12 @@ body.user-ortu aside {
           <div class="bg-slate-100 p-4 sm:p-6 rounded-xl border border-slate-300 flex flex-col justify-between h-full">
             <div>
               <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm sm:text-base">
-                <i data-lucide="eye" class="w-4 h-4 text-emerald-600"></i> Preview Pesan WhatsApp
+                <i data-lucide="eye" class="w-4 h-4 text-blue-600"></i> Preview Pesan WhatsApp
               </h3>
               <div id="wa-preview" class="bg-white p-3 sm:p-4 rounded-lg shadow-inner text-xs sm:text-sm font-mono whitespace-pre-wrap text-slate-700 border border-slate-200 min-h-[250px] sm:min-h-[350px]">
               </div>
             </div>
-            <button onclick="sendWhatsApp()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 sm:py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-xs sm:text-sm">
+            <button onclick="sendWhatsApp()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 sm:py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md text-xs sm:text-sm">
               <i data-lucide="message-circle" class="w-4 h-4"></i> Kirim Langsung via WhatsApp
             </button>
           </div>
@@ -906,17 +960,17 @@ body.user-ortu aside {
           <div class="space-y-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tanggal Setoran</label>
-              <input type="date" id="input-tanggal" value="" onchange="autoFillFromRencanaWA()" required class="w-full bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+              <input type="date" id="input-tanggal" value="" onchange="autoFillFromRencanaWA()" required class="w-full bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Filter Kelas</label>
-              <select id="input-filter-kelas" onchange="filterSiswaByKelas('input-filter-kelas', 'input-siswa')" class="select-kelas-list w-full bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+              <select id="input-filter-kelas" onchange="filterSiswaByKelas('input-filter-kelas', 'input-siswa')" class="select-kelas-list w-full bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">-- Semua Kelas --</option>
               </select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Siswa</label>
-              <select id="input-siswa" onchange="updateSiswaKelas(); autoFillFromRencanaWA();checkExistingMutabaah();" required class="select-siswa-list w-full bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+              <select id="input-siswa" onchange="updateSiswaKelas(); autoFillFromRencanaWA();checkExistingMutabaah();" required class="select-siswa-list w-full bg-white px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="" disabled selected>-- Memuat Siswa... --</option>
               </select> 
             </div>
@@ -927,53 +981,53 @@ body.user-ortu aside {
           </div>
 
           <!-- Notifikasi jika data otomatis terisi -->
-          <div id="autofill-alert" class="hidden p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-lg flex items-center gap-2">
-            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+          <div id="autofill-alert" class="hidden p-2.5 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-lg flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-600 flex-shrink-0"></i>
             <span>Target terisi otomatis dari <strong>Rencana WA</strong>.</span>
           </div>
 
           <!-- SETORAN ZIYADAH -->
           <div class="border rounded-xl p-3 bg-white shadow-sm space-y-2.5 border-slate-200">
-            <h3 class="font-bold text-emerald-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
-              <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-600"></i> Setoran Ziyadah (Hafalan Baru)
+            <h3 class="font-bold text-blue-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-blue-600"></i> Setoran Ziyadah (Hafalan Baru)
             </h3>
             <div class="space-y-2">
               <div class="relative">
                 <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Dari (Surat : Ayat)</label>
-                <input type="text" id="ziyadah-dari-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'ziyadah-dari-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="ziyadah-dari-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'ziyadah-dari-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 <div id="ziyadah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
               </div>
               <div class="relative">
                 <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Sampai (Surat : Ayat)</label>
-                <input type="text" id="ziyadah-sampai-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'ziyadah-sampai-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="ziyadah-sampai-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'ziyadah-sampai-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 <div id="ziyadah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
               </div>
               <div>
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Nilai Ziyadah (0 - 100)</label>
-                <input type="number" id="ziyadah-nilai-angka" min="0" max="100" placeholder="0 - 100" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                <input type="number" id="ziyadah-nilai-angka" min="0" max="100" placeholder="0 - 100" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-600">
               </div>
             </div>
           </div>
 
           <!-- SETORAN MURAJA'AH -->
           <div class="border rounded-xl p-3 bg-white shadow-sm space-y-2.5 border-slate-200">
-            <h3 class="font-bold text-emerald-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
-              <i data-lucide="refresh-cw" class="w-4 h-4 text-emerald-600"></i> Setoran Muraja'ah (Pengulangan)
+            <h3 class="font-bold text-blue-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+              <i data-lucide="refresh-cw" class="w-4 h-4 text-blue-600"></i> Setoran Muraja'ah (Pengulangan)
             </h3>
             <div class="space-y-2">
               <div class="relative">
                 <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Dari (Surat : Ayat)</label>
-                <input type="text" id="murajaah-dari-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'murajaah-dari-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="murajaah-dari-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'murajaah-dari-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 <div id="murajaah-dari-dropdown" class="autocomplete-dropdown hidden"></div>
               </div>
               <div class="relative">
                 <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Sampai (Surat : Ayat)</label>
-                <input type="text" id="murajaah-sampai-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'murajaah-sampai-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="murajaah-sampai-input" autocomplete="off" placeholder="Ketik surat & ayat" oninput="handleQuranFilter(this, 'murajaah-sampai-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 <div id="murajaah-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
               </div>
               <div>
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Nilai Muraja'ah (A-D)</label>
-                <select id="murajaah-nilai" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                <select id="murajaah-nilai" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-600">
                   <option value="" disabled selected>-- Pilih --</option>
                   <option value="A">A (Sangat Baik)</option>
                   <option value="B">B (Baik)</option>
@@ -986,36 +1040,36 @@ body.user-ortu aside {
 
           <!-- SETORAN TAHSIN / IQRO -->
           <div class="border rounded-xl p-3 bg-white shadow-sm space-y-2.5 border-slate-200">
-            <h3 class="font-bold text-emerald-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
-              <i data-lucide="book-open-check" class="w-4 h-4 text-emerald-600"></i> Setoran Tahsin / Iqro
+            <h3 class="font-bold text-blue-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+              <i data-lucide="book-open-check" class="w-4 h-4 text-blue-600"></i> Setoran Tahsin / Iqro
             </h3>
             <div class="space-y-2">
               <div class="relative">
                 <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Dari (Iqro / Surat : Ayat)</label>
-                <input type="text" id="tahsin-dari-input" autocomplete="off" placeholder="Ketik iqro atau surat..." oninput="handleCombinedFilter(this, 'tahsin-dari-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="tahsin-dari-input" autocomplete="off" placeholder="Ketik iqro atau surat..." oninput="handleCombinedFilter(this, 'tahsin-dari-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 <div id="tahsin-dari-dropdown" class="autocomplete-dropdown hidden"></div>
               </div>
               <div class="relative">
                 <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Sampai (Iqro / Surat : Ayat)</label>
-                <input type="text" id="tahsin-sampai-input" autocomplete="off" placeholder="Ketik iqro atau surat..." oninput="handleCombinedFilter(this, 'tahsin-sampai-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="tahsin-sampai-input" autocomplete="off" placeholder="Ketik iqro atau surat..." oninput="handleCombinedFilter(this, 'tahsin-sampai-dropdown')" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                 <div id="tahsin-sampai-dropdown" class="autocomplete-dropdown hidden"></div>
               </div>
               <div>
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Nilai Tahsin/Iqro (0 - 100)</label>
-                <input type="number" id="tahsin-nilai-angka" min="0" max="100" placeholder="0 - 100" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                <input type="number" id="tahsin-nilai-angka" min="0" max="100" placeholder="0 - 100" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-600">
               </div>
             </div>
           </div>
 
           <!-- PENILAIAN ADAB & KEDISIPLINAN -->
           <div class="border rounded-xl p-3 bg-white shadow-sm space-y-2.5 border-slate-200">
-            <h3 class="font-bold text-emerald-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
-              <i data-lucide="award" class="w-4 h-4 text-emerald-600"></i> Penilaian Adab & Kedisiplinan
+            <h3 class="font-bold text-blue-800 text-xs flex items-center gap-1.5 border-b border-slate-100 pb-1.5">
+              <i data-lucide="award" class="w-4 h-4 text-blue-600"></i> Penilaian Adab & Kedisiplinan
             </h3>
             <div class="space-y-2">
               <div>
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Nilai Adab (A-D)</label>
-                <select id="adab-nilai-dropdown" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-600">
+                <select id="adab-nilai-dropdown" required class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-600">
                   <option value="" disabled selected>-- Pilih Predikat --</option>
                   <option value="A">A (Sangat Baik / Santun)</option>
                   <option value="B">B (Baik / Sopan)</option>
@@ -1025,45 +1079,45 @@ body.user-ortu aside {
               </div>
               <div>
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Catatan Sikap & Adab</label>
-                <input type="text" id="adab-catatan" placeholder="cth: Sangat tertib dan sopan" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <input type="text" id="adab-catatan" placeholder="cth: Sangat tertib dan sopan" class="w-full border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
               </div>
             </div>
           </div>
 
           <!-- CATATAN EVALUASI GURU -->
           <div class="border rounded-xl p-3 bg-slate-50 shadow-sm space-y-2.5 border-slate-200">
-            <h3 class="font-bold text-emerald-800 text-xs flex items-center gap-1.5 border-b border-slate-200 pb-1.5">
-              <i data-lucide="message-square" class="w-4 h-4 text-emerald-600"></i> Evaluasi Guru
+            <h3 class="font-bold text-blue-800 text-xs flex items-center gap-1.5 border-b border-slate-200 pb-1.5">
+              <i data-lucide="message-square" class="w-4 h-4 text-blue-600"></i> Evaluasi Guru
             </h3>
             
             <div class="space-y-2">
               <!-- Multi-select Tajwid -->
               <div class="relative">
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Evaluasi Tajwid</label>
-                <button type="button" onclick="toggleMultiSelect('dropdown-tajwid')" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-left flex justify-between items-center focus:ring-2 focus:ring-emerald-500 outline-none">
+                <button type="button" onclick="toggleMultiSelect('dropdown-tajwid')" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-left flex justify-between items-center focus:ring-2 focus:ring-blue-500 outline-none">
                   <span id="label-tajwid" class="truncate text-slate-500">- Tidak Ada -</span>
                   <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
 
                 <div id="dropdown-tajwid" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 p-2 space-y-1 max-h-48 overflow-y-auto">
                   <label class="flex items-center gap-2 p-1 text-xs hover:bg-slate-50 rounded cursor-pointer">
-                    <input type="checkbox" value="Panjang Pendek (Mad)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+                    <input type="checkbox" value="Panjang Pendek (Mad)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-blue-600 focus:ring-blue-500">
                     Panjang Pendek (Mad)
                   </label>
                   <label class="flex items-center gap-2 p-1 text-xs hover:bg-slate-50 rounded cursor-pointer">
-                    <input type="checkbox" value="Gunnah (Dengung)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+                    <input type="checkbox" value="Gunnah (Dengung)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-blue-600 focus:ring-blue-500">
                     Gunnah (Dengung)
                   </label>
                   <label class="flex items-center gap-2 p-1 text-xs hover:bg-slate-50 rounded cursor-pointer">
-                    <input type="checkbox" value="Qolqolah (Pantulan)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+                    <input type="checkbox" value="Qolqolah (Pantulan)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-blue-600 focus:ring-blue-500">
                     Qolqolah (Pantulan)
                   </label>
                   <label class="flex items-center gap-2 p-1 text-xs hover:bg-slate-50 rounded cursor-pointer">
-                    <input type="checkbox" value="Ikhfa (Samar)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+                    <input type="checkbox" value="Ikhfa (Samar)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-blue-600 focus:ring-blue-500">
                     Ikhfa (Samar)
                   </label>
                   <label class="flex items-center gap-2 p-1 text-xs hover:bg-slate-50 rounded cursor-pointer">
-                    <input type="checkbox" value="Waqaf (Tanda Berhenti)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-emerald-600 focus:ring-emerald-500">
+                    <input type="checkbox" value="Waqaf (Tanda Berhenti)" onchange="updateMultiSelect('tajwid')" class="chk-tajwid rounded text-blue-600 focus:ring-blue-500">
                     Waqaf (Tanda Berhenti)
                   </label>
                 </div>
@@ -1072,7 +1126,7 @@ body.user-ortu aside {
               <!-- Multi-select Pelafalan Huruf -->
               <div class="relative">
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Perbaikan Pelafalan</label>
-                <button type="button" onclick="toggleMultiSelect('dropdown-pelafalan')" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-left flex justify-between items-center focus:ring-2 focus:ring-emerald-500 outline-none">
+                <button type="button" onclick="toggleMultiSelect('dropdown-pelafalan')" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-left flex justify-between items-center focus:ring-2 focus:ring-blue-500 outline-none">
                   <span id="label-pelafalan" class="truncate text-slate-500">- Semua Sesuai -</span>
                   <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
@@ -1085,7 +1139,7 @@ body.user-ortu aside {
               <!-- Multi-Select Autocomplete Kelancaran -->
               <div class="relative">
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Perbaikan Kelancaran</label>
-                <div id="kelancaran-container" onclick="document.getElementById('catatan-kelancaran-input').focus()" class="w-full bg-white border rounded-lg p-1 flex flex-wrap gap-1 items-center min-h-[32px] focus-within:ring-2 focus-within:ring-emerald-500 border-slate-300 cursor-text">
+                <div id="kelancaran-container" onclick="document.getElementById('catatan-kelancaran-input').focus()" class="w-full bg-white border rounded-lg p-1 flex flex-wrap gap-1 items-center min-h-[32px] focus-within:ring-2 focus-within:ring-blue-500 border-slate-300 cursor-text">
                   <div id="kelancaran-tags" class="flex flex-wrap gap-1"></div>
                   <input type="text" id="catatan-kelancaran-input" autocomplete="off" placeholder="Ketik Surat : Ayat..." oninput="handleQuranFilterMulti(this)" class="bg-transparent text-xs outline-none flex-1 min-w-[80px] px-1 py-0.5">
                 </div>
@@ -1094,12 +1148,12 @@ body.user-ortu aside {
 
               <div>
                 <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Catatan Tambahan Ustaz/Ustazah</label>
-                <textarea id="catatan-guru-tambahan" rows="2" placeholder="Masukkan bimbingan khusus..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                <textarea id="catatan-guru-tambahan" rows="2" placeholder="Masukkan bimbingan khusus..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
               </div>
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2 text-xs">
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition-colors shadow-lg flex items-center justify-center gap-2 text-xs">
             <i data-lucide="save" class="w-4 h-4"></i> Simpan Mutabaah Harian
           </button>
         </form>
@@ -1119,14 +1173,14 @@ body.user-ortu aside {
                id="search-surah-input" 
                oninput="filterSurahList(this.value)" 
                placeholder="Cari nama surah... (contoh: Al-Baqarah)" 
-               class="w-full pl-8 pr-2 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 min-h-[36px]">
+               class="w-full pl-8 pr-2 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 min-h-[36px]">
         <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5"></i>
       </div>
 
       <!-- Filter Dropdown Juz -->
       <select id="select-mushaf-juz" 
               onchange="jumpToJuz(this.value)" 
-              class="w-full py-2 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer min-h-[36px]">
+              class="w-full py-2 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer min-h-[36px]">
         <option value="">-- Pilih Juz (1 - 30) --</option>
       </select>
     </div>
@@ -1134,7 +1188,7 @@ body.user-ortu aside {
     <!-- Dropdown Hasil Surah -->
     <select id="select-mushaf-surah" 
             onchange="jumpToSurah(this.value)" 
-            class="w-full py-2 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer min-h-[36px]">
+            class="w-full py-2 px-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer min-h-[36px]">
       <option value="">-- Pilih Surah --</option>
     </select>
   </div>
@@ -1150,7 +1204,7 @@ body.user-ortu aside {
       
       <div class="flex items-center gap-1 text-xs font-semibold px-1">
         <span>Hal.</span>
-        <input type="number" id="quran-page-num" value="1" min="1" max="604" onchange="loadQuranPage(this.value)" class="w-12 text-center py-0.5 border border-slate-200 rounded bg-white outline-none focus:ring-1 focus:ring-emerald-500 font-bold">
+        <input type="number" id="quran-page-num" value="1" min="1" max="604" onchange="loadQuranPage(this.value)" class="w-12 text-center py-0.5 border border-slate-200 rounded bg-white outline-none focus:ring-1 focus:ring-blue-500 font-bold">
         <span>/ 604</span>
       </div>
 
@@ -1165,7 +1219,7 @@ body.user-ortu aside {
         <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i>
       </button>
 
-      <button type="button" id="tool-pen" onclick="setCanvasTool('pen')" class="p-1.5 bg-emerald-600 text-white rounded-lg transition-colors" title="Pena">
+      <button type="button" id="tool-pen" onclick="setCanvasTool('pen')" class="p-1.5 bg-blue-600 text-white rounded-lg transition-colors" title="Pena">
         <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
       </button>
 
@@ -1182,7 +1236,7 @@ body.user-ortu aside {
         <input type="color" id="pen-color" value="#dc2626" class="w-6 h-6 rounded cursor-pointer border border-slate-300 p-0 bg-transparent">
         
         <div class="flex items-center gap-1 px-1">
-          <input type="range" id="pen-opacity" min="0" max="100" value="40" step="5" class="w-12 h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+          <input type="range" id="pen-opacity" min="0" max="100" value="40" step="5" class="w-12 h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-600">
           <span id="opacity-label" class="text-[10px] font-semibold text-slate-600 w-6 text-right select-none">40%</span>
         </div>
       </div>
@@ -1191,7 +1245,7 @@ body.user-ortu aside {
         <i data-lucide="undo-2" class="w-3.5 h-3.5"></i>
       </button>
 
-      <button type="button" id="download-btn-handle" onclick="downloadQuranWithAnnotations()" title="Unduh" class="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all flex items-center justify-center ml-0.5">
+      <button type="button" id="download-btn-handle" onclick="downloadQuranWithAnnotations()" title="Unduh" class="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all flex items-center justify-center ml-0.5">
         <svg id="download-icon" class="w-4 h-4 origin-center transition-transform duration-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
         </svg>
@@ -1209,7 +1263,7 @@ body.user-ortu aside {
   <!-- FLOATING BOX LOADING & ZOOM (Fixed di Pojok Kiri Atas Viewport) -->
   <div id="quran-loading" class="sticky top-2 left-2 self-start z-50 inline-flex items-center gap-3 bg-white/95 shadow-xl border border-slate-300 p-2.5 rounded-xl select-none touch-none shrink-0 h-fit">
     <div id="drag-handle" class="flex items-center gap-2 cursor-grab active:cursor-grabbing pr-2 border-r border-slate-200">
-      <div class="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin shrink-0"></div>
+      <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin shrink-0"></div>
       <span id="loading-text" class="text-xs font-semibold text-slate-700 whitespace-nowrap">
         Memuat Halaman Qur'an...
       </span>
@@ -1249,7 +1303,7 @@ body.user-ortu aside {
             <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Laporan Bulanan Siswa</h2>
             <p class="text-slate-500 text-xs sm:text-sm">Pilih siswa dan bulan untuk melihat ringkasan perkembangan hafalan.</p>
           </div>
-          <button onclick="downloadPDF()" class="bg-emerald-600 text-white px-4 sm:px-5 py-2.5 rounded-lg hover:bg-emerald-700 flex items-center gap-2 transition-colors text-xs sm:text-sm self-start sm:self-auto">
+          <button onclick="downloadPDF()" class="bg-blue-600 text-white px-4 sm:px-5 py-2.5 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors text-xs sm:text-sm self-start sm:self-auto">
             <i data-lucide="download" class="w-4 h-4"></i> Export ke PDF
           </button>
         </div>
@@ -1258,19 +1312,19 @@ body.user-ortu aside {
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Filter Kelas</label>
-              <select id="report-filter-kelas" onchange="filterSiswaByKelas('report-filter-kelas', 'report-filter-siswa')" class="select-kelas-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+              <select id="report-filter-kelas" onchange="filterSiswaByKelas('report-filter-kelas', 'report-filter-siswa')" class="select-kelas-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">-- Semua Kelas --</option>
               </select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Siswa (Otomatis)</label>
-              <select id="report-filter-siswa" onchange="updateReportSiswaInfo(); loadReportData();" class="select-siswa-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+              <select id="report-filter-siswa" onchange="updateReportSiswaInfo(); loadReportData();" class="select-siswa-list w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="" disabled selected>-- Memuat Siswa... --</option>
               </select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Pilih Bulan & Tahun</label>
-              <input type="month" id="report-filter-bulan" onchange="loadReportData()" class="w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+              <input type="month" id="report-filter-bulan" onchange="loadReportData()" class="w-full bg-slate-50 border rounded-lg px-3 py-2 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="flex items-end">
               <button onclick="loadReportData()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium h-[38px] rounded-lg transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm">
@@ -1282,17 +1336,17 @@ body.user-ortu aside {
           <div class="border-t pt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Semester (Input Manual)</label>
-              <input type="text" id="manual-input-semester" oninput="updateReportManualInputs()" value="1 (SATU)" placeholder="Contoh: 1 (SATU)" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+              <input type="text" id="manual-input-semester" oninput="updateReportManualInputs()" value="1 (SATU)" placeholder="Contoh: 1 (SATU)" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tahun Pelajaran (Input Manual)</label>
-              <input type="text" id="manual-input-thn-ajaran" oninput="updateReportManualInputs()" value="2025/2026" placeholder="Contoh: 2025/2026" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+              <input type="text" id="manual-input-thn-ajaran" oninput="updateReportManualInputs()" value="2025/2026" placeholder="Contoh: 2025/2026" class="w-full bg-amber-50/50 border border-amber-200 rounded-lg px-3 py-1.5 text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div class="sm:col-span-2">
               <label class="block text-xs font-semibold text-amber-800 uppercase mb-1 flex items-center gap-1">
                 <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Catatan / Evaluasi Guru (Input Manual)
               </label>
-              <textarea id="report-input-evaluasi" oninput="updateReportManualInputs()" rows="2" placeholder="Tuliskan evaluasi bulanan di sini..." class="w-full bg-amber-50/50 border border-amber-200 rounded-lg p-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+              <textarea id="report-input-evaluasi" oninput="updateReportManualInputs()" rows="2" placeholder="Tuliskan evaluasi bulanan di sini..." class="w-full bg-amber-50/50 border border-amber-200 rounded-lg p-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
             </div>
           </div>
         </div>
@@ -1403,7 +1457,7 @@ body.user-ortu aside {
                 </div>
                 <div>
                   <span class="block text-slate-500 text-[10px] uppercase">Keterangan:</span>
-                  <strong id="keterangan-capaian" class="text-emerald-700 font-bold">-</strong>
+                  <strong id="keterangan-capaian" class="text-blue-700 font-bold">-</strong>
                 </div>
               </div>
             </div>
@@ -1622,7 +1676,7 @@ if (kelancaranInput) {
       const label = document.createElement('label');
       label.className = 'flex items-center gap-2 p-1.5 text-xs hover:bg-slate-50 rounded cursor-pointer';
       label.innerHTML = `
-        <input type="checkbox" value="${huruf}" onchange="updateMultiSelect('pelafalan')" class="chk-pelafalan rounded text-emerald-600 focus:ring-emerald-500">
+        <input type="checkbox" value="${huruf}" onchange="updateMultiSelect('pelafalan')" class="chk-pelafalan rounded text-blue-600 focus:ring-blue-500">
         ${huruf}
       `;
       containerPelafalan.appendChild(label);
@@ -1910,10 +1964,10 @@ function filterRiwayatOrtu() {
     tbody.innerHTML = filteredData.map(r => `
       <tr class="border-b border-slate-100 hover:bg-slate-50">
         <td class="p-2.5 font-medium whitespace-nowrap">${formatDateToShort(r.tanggal)}</td>
-        <td class="p-2.5">${r.ziyadah_dari || '-'} - ${r.ziyadah_sampai || '-'} <br><span class="text-[10px] text-emerald-600 font-bold">Nilai: ${r.ziyadah_nilai || '-'}</span></td>
-        <td class="p-2.5"> ${r.tahsin_dari || '-'} - ${r.tahsin_sampai || '-'}<br><span class="text-[10px] text-teal-600 font-bold">Nilai: ${r.tahsin_nilai || '-'}</span></td>
+        <td class="p-2.5">${r.ziyadah_dari || '-'} - ${r.ziyadah_sampai || '-'} <br><span class="text-[10px] text-blue-600 font-bold">Nilai: ${r.ziyadah_nilai || '-'}</span></td>
+        <td class="p-2.5"> ${r.tahsin_dari || '-'} - ${r.tahsin_sampai || '-'}<br><span class="text-[10px] text-indigo-600 font-bold">Nilai: ${r.tahsin_nilai || '-'}</span></td>
         <td class="p-2.5"> ${r.murajaah_dari || '-'} - ${r.murajaah_sampai || '-'}<br><span class="text-[10px] text-blue-600 font-bold">Nilai: ${r.murajaah_nilai || '-'}</span></td>
-        <td class="p-2.5 text-center font-bold text-emerald-700">${r.adab_nilai || '-'}</td>
+        <td class="p-2.5 text-center font-bold text-blue-700">${r.adab_nilai || '-'}</td>
       </tr>
     `).join('');
   } else {
@@ -2058,7 +2112,7 @@ async function loadDashboardOrangTua(namaAnak) {
           <p><strong>📖 Ziyadah:</strong> ${d.targetBesok.ziyadahDari || '-'} s/d ${d.targetBesok.ziyadahSampai || '-'}</p>
           <p><strong>📚 Tahsin:</strong> ${d.targetBesok.tahsinDari || '-'} s/d ${d.targetBesok.tahsinSampai || '-'}</p>
           <p><strong>🔄 Muraja'ah:</strong> ${d.targetBesok.murajaahDari || '-'} s/d ${d.targetBesok.murajaahSampai || '-'}</p>
-          ${d.targetBesok.catatan ? `<div class="p-2 bg-emerald-100/80 rounded mt-2 text-xs font-medium text-emerald-900">💬 Catatan: ${d.targetBesok.catatan}</div>` : ''}
+          ${d.targetBesok.catatan ? `<div class="p-2 bg-blue-100/80 rounded mt-2 text-xs font-medium text-blue-900">💬 Catatan: ${d.targetBesok.catatan}</div>` : ''}
         `;
       } else {
         targetBox.innerHTML = `<p class="text-slate-500 italic">Belum ada rencana target terbaru untuk ananda.</p>`;
@@ -3118,7 +3172,7 @@ function handleQuranFilterMulti(inputEl) {
 
   // Tampilkan daftar hasil pencarian
   dropdown.innerHTML = filtered.map(item => `
-    <div onclick="addKelancaranTag('${item.replace(/'/g, "\\'")}')" class="p-2 hover:bg-emerald-50 cursor-pointer border-b border-slate-100 last:border-none text-xs text-slate-700">
+    <div onclick="addKelancaranTag('${item.replace(/'/g, "\\'")}')" class="p-2 hover:bg-blue-50 cursor-pointer border-b border-slate-100 last:border-none text-xs text-slate-700">
       ${item}
     </div>
   `).join('');
@@ -3154,7 +3208,7 @@ function renderKelancaranTags() {
   if (!container) return;
 
   container.innerHTML = selectedKelancaranList.map((item, index) => `
-    <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-md font-medium">
+    <span class="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-md font-medium">
       ${item}
       <button type="button" onclick="removeKelancaranTag(${index})" class="hover:text-red-600 focus:outline-none ml-0.5">
         &times;
@@ -3528,10 +3582,10 @@ function setCanvasTool(tool) {
     }
   });
 
-  // Beri warna aktif (emerald) pada tombol yang dipilih
+  // Beri warna aktif (blue) pada tombol yang dipilih
   const activeBtn = document.getElementById(`tool-${tool}`);
   if (activeBtn) {
-    activeBtn.className = "p-1.5 bg-emerald-600 text-white rounded-lg transition-colors";
+    activeBtn.className = "p-1.5 bg-blue-600 text-white rounded-lg transition-colors";
   }
 
   if (!canvas) return;
