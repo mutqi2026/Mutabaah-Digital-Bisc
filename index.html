@@ -2622,7 +2622,7 @@ function resetMutabaahFieldsOnly() {
       const query = inputEl.value.toLowerCase().trim();
       const dropdown = document.getElementById(dropdownId);
       if (!query) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; return; }
-      const filtered = fullQuranOptions.filter(item => item.toLowerCase().includes(query)).slice(0, 30);
+      const filtered = fullQuranOptions.filter(item => item.toLowerCase().includes(query)).slice(0, 1000);
       if (filtered.length === 0) { dropdown.classList.add('hidden'); dropdown.innerHTML = ''; return; }
       dropdown.innerHTML = '';
       filtered.forEach(itemText => {
