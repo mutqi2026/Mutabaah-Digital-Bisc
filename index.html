@@ -1,3 +1,6 @@
+
+index.html
+100%
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -692,6 +695,7 @@ body.user-ortu aside {
 </section>
 
       <!-- DASHBOARD -->
+<!-- DASHBOARD -->
       <section id="page-dashboard" class="page space-y-6">
         <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -716,6 +720,50 @@ body.user-ortu aside {
           <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
             <div class="p-3 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="calendar"></i></div>
             <div><p class="text-xs text-slate-500">Sistem</p><p class="text-lg sm:text-xl font-bold text-blue-600">Terhubung</p></div>
+          </div>
+        </div>
+
+        <!-- WIDGET RIWAYAT SETORAN SELURUH SISWA (DENGAN FILTER KELAS & NAMA ANAK) -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i data-lucide="history" class="w-5 h-5 text-blue-600"></i> Riwayat Setoran Seluruh Siswa
+            </h3>
+            
+            <!-- Filter Kelas & Anak -->
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <!-- Filter Kelas -->
+              <select id="dash-filter-kelas" onchange="handleDashFilterKelasChange()" class="select-kelas-list bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
+                <option value="">-- Semua Kelas --</option>
+              </select>
+
+              <!-- Filter Nama Anak / Siswa -->
+              <select id="dash-filter-siswa" onchange="loadDashboardRiwayatSetoran()" class="select-siswa-list bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 font-semibold cursor-pointer">
+                <option value="">-- Semua Anak --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-xs text-left text-slate-700 border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold uppercase">
+                  <th class="p-3">Tanggal</th>
+                  <th class="p-3">Nama Siswa</th>
+                  <th class="p-3">Kelas</th>
+                  <th class="p-3">Ziyadah</th>
+                  <th class="p-3">Muraja'ah</th>
+                  <th class="p-3">Tahsin</th>
+                  <th class="p-3 text-center">Adab</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="dash-tbody-riwayat">
+                <tr>
+                  <td colspan="8" class="p-6 text-center text-slate-400">Memuat riwayat setoran...</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -1808,10 +1856,9 @@ async function handleLogin(e) {
       if (role !== 'admin' && masterNav) {
         masterNav.classList.add('hidden');
       }
-
+initDashboardRiwayat();
       await fetchSiswaFromScript();
       await fetchDashboardStats();
-
       // Tampilkan Layout Utama App
       document.getElementById('page-login').classList.remove('active');
       const appLayout = document.getElementById('app-layout');
@@ -2576,6 +2623,10 @@ async function submitMutabaah(e) {
   if (res && res.result === "success") {
     const statusText = isEditMode ? "diperbarui" : "tersimpan";
     alert(`Data Mutabaah Harian berhasil ${statusText} di Google Sheets!`);
+    
+    if (typeof initDashboardRiwayat === 'function') {
+      initDashboardRiwayat();
+    }
     
     // Reset Form
     document.getElementById('form-mutabaah').reset();
@@ -4040,6 +4091,195 @@ function updateLayoutByRole(role) {
 
 // Panggil fungsi di atas saat pengguna selesai login / memuat halaman:
 // Contoh: updateLayoutByRole(currentUser.role);
-  </script>
+
+// Variabel penyimpan cache seluruh riwayat dashboard
+let allDashboardRiwayat = [];
+
+// Fungsi untuk memuat data riwayat setoran saat Dashboard dibuka
+// Fungsi untuk memuat data riwayat setoran saat Dashboard dibuka
+// 1. Perbarui fungsi initDashboardRiwayat agar mengisi dropdown filter dan menarik data sekaligus
+async function initDashboardRiwayat() {
+  const tbody = document.getElementById('dash-tbody-riwayat');
+  const selectKelas = document.getElementById('dash-filter-kelas');
+  const selectSiswa = document.getElementById('dash-filter-siswa');
+  
+  if (!tbody) return;
+
+  // Isi dropdown Kelas secara dinamis dari data siswa yang sudah dimuat
+  if (selectKelas) {
+    const uniqueKelas = [...new Set(loadedSiswaData.map(s => s.kelas).filter(Boolean))];
+    selectKelas.innerHTML = '<option value="">-- Semua Kelas --</option>';
+    uniqueKelas.forEach(k => {
+      selectKelas.appendChild(new Option(k, k));
+    });
+  }
+
+  // Isi dropdown Siswa secara awal (semua siswa)
+  if (selectSiswa) {
+    selectSiswa.innerHTML = '<option value="">-- Semua Anak --</option>';
+    loadedSiswaData.forEach(s => {
+      selectSiswa.appendChild(new Option(s.nama, s.nama));
+    });
+  }
+
+  tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500">Memuat riwayat setoran...</td></tr>`;
+
+  try {
+    // Menggunakan action getAllMutabaahDashboard (pastikan kodenya sudah ditambahkan di Google Apps Script)
+    const response = await fetch(`${SCRIPT_URL}?action=getAllMutabaahDashboard`);
+    const json = await response.json();
+
+    if (json.result === "success" && Array.isArray(json.data)) {
+      allDashboardRiwayat = json.data;
+      loadDashboardRiwayatSetoran();
+    } else {
+      allDashboardRiwayat = [];
+      tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">Belum ada riwayat setoran tercatat di sistem.</td></tr>`;
+    }
+  } catch (err) {
+    console.error("Gagal memuat riwayat dashboard:", err);
+    tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-rose-500">Gagal mengambil data dari server.</td></tr>`;
+  }
+}
+
+// Handler saat filter kelas diubah
+function handleDashFilterKelasChange() {
+  const selectedKelas = document.getElementById('dash-filter-kelas').value.trim().toLowerCase();
+  const siswaSelect = document.getElementById('dash-filter-siswa');
+
+  if (siswaSelect) {
+    siswaSelect.innerHTML = '<option value="">-- Semua Anak --</option>';
+    let filteredSiswa = loadedSiswaData;
+    if (selectedKelas) {
+      filteredSiswa = loadedSiswaData.filter(s => String(s.kelas || '').trim().toLowerCase() === selectedKelas);
+    }
+    filteredSiswa.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.nama;
+      opt.textContent = item.nama;
+      siswaSelect.appendChild(opt);
+    });
+  }
+
+  loadDashboardRiwayatSetoran();
+}
+
+// Fungsi Filter & Render Tabel Riwayat di Dashboard
+// Fungsi Filter & Render Tabel Riwayat di Dashboard (Dilengkapi Tombol Edit & Hapus)
+function loadDashboardRiwayatSetoran() {
+  const selectedKelas = document.getElementById('dash-filter-kelas')?.value.trim().toLowerCase() || '';
+  const selectedSiswa = document.getElementById('dash-filter-siswa')?.value.trim().toLowerCase() || '';
+  const tbody = document.getElementById('dash-tbody-riwayat');
+
+  if (!tbody) return;
+
+  const filtered = allDashboardRiwayat.filter(item => {
+    const itemKelas = String(item.kelas || '').trim().toLowerCase();
+    const itemNama = String(item.nama || '').trim().toLowerCase();
+
+    if (selectedKelas && itemKelas !== selectedKelas) return false;
+    if (selectedSiswa && itemNama !== selectedSiswa) return false;
+    return true;
+  });
+
+  if (filtered.length > 0) {
+    tbody.innerHTML = filtered.map((r) => `
+      <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <td class="p-3 font-medium whitespace-nowrap">${formatDateToShort(r.tanggal)}</td>
+        <td class="p-3 font-bold text-slate-800">${r.nama}</td>
+        <td class="p-3 text-slate-600">${r.kelas}</td>
+        <td class="p-3">
+          <div>${r.ziyadah_dari !== '-' ? `${r.ziyadah_dari} - ${r.ziyadah_sampai}` : '-'}</div>
+          <span class="text-[10px] text-blue-600 font-bold">Nilai: ${r.ziyadah_nilai}</span>
+        </td>
+        <td class="p-3">
+          <div>${r.murajaah_dari !== '-' ? `${r.murajaah_dari} - ${r.murajaah_sampai}` : '-'}</div>
+          <span class="text-[10px] text-indigo-600 font-bold">Nilai: ${r.murajaah_nilai}</span>
+        </td>
+        <td class="p-3">
+          <div>${r.tahsin_dari !== '-' ? `${r.tahsin_dari} - ${r.tahsin_sampai}` : '-'}</div>
+          <span class="text-[10px] text-blue-600 font-bold">Nilai: ${r.tahsin_nilai}</span>
+        </td>
+        <td class="p-3 text-center font-bold text-amber-600">${r.adab_nilai}</td>
+        <td class="p-3 text-center">
+          <div class="flex items-center justify-center gap-1.5">
+            <!-- Tombol Edit / Inspeksi -->
+            <button onclick="inspectRiwayatDetail('${r.nama.replace(/'/g, "\\'")}', '${r.tanggal}')" class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors" title="Edit / Lihat Detail">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+            <!-- Tombol Hapus -->
+            <button onclick="hapusRiwayatSetoran('${r.nama.replace(/'/g, "\\'")}', '${r.tanggal}')" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors" title="Hapus Setoran">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  } else {
+    tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">Tidak ada riwayat setoran yang sesuai dengan filter.</td></tr>`;
+  }
+}
+
+// Fungsi untuk mengeksekusi penghapusan data
+async function hapusRiwayatSetoran(namaSiswa, tanggalSetoran) {
+  const tglClean = String(tanggalSetoran).split('T')[0];
+  const konfirmasi = confirm(`Apakah Anda yakin ingin menghapus data setoran untuk ${namaSiswa} pada tanggal ${formatDateToShort(tglClean)}?`);
+  
+  if (!konfirmasi) return;
+
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=deleteMutabaah&siswa=${encodeURIComponent(namaSiswa)}&tanggal=${encodeURIComponent(tglClean)}`);
+    const json = await response.json();
+
+    if (json.result === "success") {
+      alert("Data setoran berhasil dihapus.");
+      // Muat ulang riwayat dashboard secara otomatis
+      initDashboardRiwayat();
+    } else {
+      alert("Gagal menghapus data: " + (json.message || "Terjadi kesalahan."));
+    }
+  } catch (err) {
+    console.error("Gagal menghapus data:", err);
+    alert("Terjadi kesalahan jaringan saat menghapus data.");
+  }
+}
+
+function inspectRiwayatDetail(namaSiswa, tanggalSetoran) {
+  // 1. Pindah ke halaman input data
+  switchPage('input-data');
+
+  // 2. Set tanggal dan siswa di form input
+  const inputTgl = document.getElementById('input-tanggal');
+  const inputSiswa = document.getElementById('input-siswa');
+
+  if (inputTgl) inputTgl.value = String(tanggalSetoran).split('T')[0];
+  if (inputSiswa) {
+    inputSiswa.value = namaSiswa;
+    // Panggil event change agar sistem otomatis menarik data lama (mode edit)
+    inputSiswa.dispatchEvent(new Event('change'));
+  }
+}
+
+function manualResetFormInput() {
+  // 1. Reset elemen form HTML secara total
+  document.getElementById('form-mutabaah').reset();
+  
+  // 2. Kembalikan nilai tanggal ke hari ini
+  const today = new Date().toISOString().split('T')[0];
+  const inputTgl = document.getElementById('input-tanggal');
+  if (inputTgl) inputTgl.value = today;
+
+  // 3. Sembunyikan alert autofill
+  const alertBox = document.getElementById('autofill-alert');
+  if (alertBox) alertBox.classList.add('hidden');
+
+  // 4. Reset status mode edit
+  isEditMode = false;
+  
+  console.log("Form berhasil dikosongkan.");
+}
+</script>
 </body>
 </html>
+Menampilkan index.html.
